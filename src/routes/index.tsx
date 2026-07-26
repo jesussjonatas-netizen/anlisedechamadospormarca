@@ -763,8 +763,30 @@ function Dashboard() {
                 <thead>
                   <tr className="bg-secondary text-left text-xs uppercase tracking-wider text-muted-foreground">
                     <th className="px-4 py-2">CD</th>
-                    <th className="px-4 py-2 text-right">Qnt. Cham.</th>
-                    <th className="px-4 py-2 text-right">Valor</th>
+                    <th
+                      className="cursor-pointer select-none px-4 py-2 text-right hover:text-white"
+                      onClick={() => {
+                        if (cdSortKey === "qnt") setCdSortDir((d) => (d === "asc" ? "desc" : "asc"));
+                        else {
+                          setCdSortKey("qnt");
+                          setCdSortDir("desc");
+                        }
+                      }}
+                    >
+                      Qnt. Cham.{cdSortKey === "qnt" ? (cdSortDir === "asc" ? " ▲" : " ▼") : ""}
+                    </th>
+                    <th
+                      className="cursor-pointer select-none px-4 py-2 text-right hover:text-white"
+                      onClick={() => {
+                        if (cdSortKey === "val") setCdSortDir((d) => (d === "asc" ? "desc" : "asc"));
+                        else {
+                          setCdSortKey("val");
+                          setCdSortDir("desc");
+                        }
+                      }}
+                    >
+                      Valor{cdSortKey === "val" ? (cdSortDir === "asc" ? " ▲" : " ▼") : ""}
+                    </th>
                     <th className="px-4 py-2 text-right">%</th>
                   </tr>
                 </thead>
@@ -778,7 +800,7 @@ function Dashboard() {
                   ) : (
                     aprovadosPorCd.rows.map((r) => (
                       <tr key={r.cd} className="border-t border-border/60 hover:bg-secondary/50">
-                        <td className="px-4 py-2 font-medium">{r.cd}</td>
+                        <td className="px-4 py-2 font-medium" title={r.cd}>{r.label}</td>
                         <td className="px-4 py-2 text-right">{fmtInt(r.qnt)}</td>
                         <td className="px-4 py-2 text-right">{fmtBRL(r.val)}</td>
                         <td className="px-4 py-2 text-right">{r.pct.toFixed(1)}%</td>
@@ -786,6 +808,7 @@ function Dashboard() {
                     ))
                   )}
                 </tbody>
+
                 {aprovadosPorCd.rows.length > 0 && (
                   <tfoot>
                     <tr className="border-t border-border bg-[var(--panel-header)] font-bold">
