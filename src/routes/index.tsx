@@ -252,8 +252,11 @@ function Dashboard() {
   const [filters, setFilters] = useState<FilterState>(emptyFilters);
   const [sortKey, setSortKey] = useState<string>("Valor");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const [cdSortKey, setCdSortKey] = useState<"qnt" | "val">("val");
+  const [cdSortDir, setCdSortDir] = useState<"asc" | "desc">("desc");
   const [page, setPage] = useState(1);
   const fileRef = useRef<HTMLInputElement>(null);
+
 
   const filtered = useMemo(() => applyFilters(rows, filters), [rows, filters]);
 
