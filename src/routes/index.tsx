@@ -35,16 +35,16 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Auditoria de Devoluções | Rede Ancora" },
+      { title: "Auditoria de Devoluções | Rede ANCORA" },
       {
         name: "description",
         content:
-          "Dashboard interno de auditoria de devoluções da Rede Ancora com KPIs, filtros e detalhamento de chamados.",
+          "Dashboard interno de auditoria de devoluções da Rede ANCORA com KPIs, filtros e detalhamento de chamados.",
       },
-      { property: "og:title", content: "Auditoria de Devoluções | Rede Ancora" },
+      { property: "og:title", content: "Auditoria de Devoluções | Rede ANCORA" },
       {
         property: "og:description",
-        content: "Painel de auditoria de devoluções da Rede Ancora.",
+        content: "Painel de auditoria de devoluções da Rede ANCORA.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -574,7 +574,7 @@ function Dashboard() {
               AUDITORIA DE DEVOLUÇÕES
             </h1>
             <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-              Rede Ancora
+              Rede ANCORA
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -894,7 +894,7 @@ function Dashboard() {
         {/* Footer */}
         <footer className="flex flex-wrap items-center justify-between gap-2 border-t border-border bg-panel px-6 py-3 text-[11px] text-muted-foreground">
           <span>
-            Fonte: Sistema HD - Rede Ancora | Dados extraídos do B2B. Valores exibidos sem impostos,
+            Fonte: Sistema HD - Rede ANCORA | Dados extraídos do B2B. Valores exibidos sem impostos,
             podendo apresentar variações.
           </span>
           <span className="inline-flex items-center gap-1">
