@@ -641,27 +641,39 @@ function Dashboard() {
           {/* KPIs */}
           <section>
             <SectionHeader>Auditoria de Chamados</SectionHeader>
-            <div className="grid grid-cols-2 gap-3 rounded-b-lg bg-panel/50 p-4 md:grid-cols-4 xl:grid-cols-7">
+            <div className="grid grid-cols-2 gap-3 rounded-b-lg bg-panel/50 p-4 md:grid-cols-4 xl:grid-cols-8">
               <KpiCard
-                title="Total de Chamados"
+                title="Total de Chamados Analisados"
                 value={fmtInt(kpi.total)}
-                color="var(--brand)"
+                color="#ffffff"
+                active={filters.status.length === 0}
+                onClick={() => setFilters((f) => ({ ...f, status: [] }))}
               />
               <KpiCard
                 title="Valor Total Analisado"
                 value={fmtBRL(kpi.valor)}
-                color="var(--brand)"
+                color="#ffffff"
+                active={filters.status.length === 0}
+                onClick={() => setFilters((f) => ({ ...f, status: [] }))}
               />
-              {STATUS_LIST.map((s) => (
-                <KpiCard
-                  key={s}
-                  title={s}
-                  value={fmtInt(kpi.byStatus[s])}
-                  sub={`${pct(kpi.byStatus[s], kpi.total)} do total`}
-                  color={STATUS_COLORS[s]}
-                />
-              ))}
+              {STATUS_LIST.map((s) => {
+                const isActive = filters.status.length === 1 && filters.status[0] === s;
+                return (
+                  <KpiCard
+                    key={s}
+                    title={s}
+                    value={fmtInt(kpi.byStatus[s])}
+                    sub={`${pct(kpi.byStatus[s], kpi.total)} do total`}
+                    color={STATUS_COLORS[s]}
+                    active={isActive}
+                    onClick={() =>
+                      setFilters((f) => ({ ...f, status: isActive ? [] : [s] }))
+                    }
+                  />
+                );
+              })}
             </div>
+
           </section>
 
           {/* Charts */}
