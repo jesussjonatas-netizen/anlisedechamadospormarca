@@ -285,15 +285,15 @@ function Dashboard() {
       Aprovado: 0,
       "Aguardando pagamento": 0,
       "Revisão necessária": 0,
+      "Aguardando Auditoria": 0,
     };
     const valorByStatus: Record<StatusKey, number> = { ...byStatus };
     for (const r of filtered) {
       const s = normStatus(r["Status Auditoria"]);
-      if (s) {
-        byStatus[s]++;
-        valorByStatus[s] += Number(r.Valor) || 0;
-      }
+      byStatus[s]++;
+      valorByStatus[s] += Number(r.Valor) || 0;
     }
+
     return { total, valor, byStatus, valorByStatus };
   }, [filtered]);
 
