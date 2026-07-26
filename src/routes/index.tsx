@@ -469,12 +469,13 @@ function Dashboard() {
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand text-[10px] font-bold uppercase leading-tight text-white">
             Rede
             <br />
-            Ancora
+            ANCORA
           </div>
           <div>
-            <div className="text-sm font-bold">Rede Ancora</div>
+            <div className="text-sm font-bold">Rede ANCORA</div>
             <div className="text-[11px] text-muted-foreground">Auditoria HD</div>
           </div>
+
         </div>
 
         <nav className="border-b border-border p-2">
