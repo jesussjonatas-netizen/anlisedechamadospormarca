@@ -126,10 +126,11 @@ function applyFilters(rows: Solicitacao[], f: FilterState, skip?: keyof FilterSt
     if (skip !== "tipo" && f.tipo.length && !f.tipo.includes(r.Tipo || "")) return false;
     if (skip !== "status" && f.status.length) {
       const s = normStatus(r["Status Auditoria"]);
-      if (!s || !f.status.includes(s)) return false;
+      if (!f.status.includes(s)) return false;
     }
     if (skip !== "cliente" && f.cliente.length && !f.cliente.includes(r.Cliente || "")) return false;
     if (skip !== "causa" && f.causa.length && !f.causa.includes(r["Causa Raiz"] || "")) return false;
+
     if (skip !== "dataDe" && f.dataDe) {
       if (!r.Data || r.Data.slice(0, 10) < f.dataDe) return false;
     }
