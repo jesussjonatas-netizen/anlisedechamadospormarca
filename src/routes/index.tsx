@@ -310,19 +310,30 @@ function Dashboard() {
     const approved = filtered.filter((r) => normStatus(r["Status Auditoria"]) === "Aprovado");
     const totalQnt = approved.length;
     const totalVal = approved.reduce((s, r) => s + (Number(r.Valor) || 0), 0);
-    const map = new Map<string, { qnt: number; val: number }>();
+    const map = new Map<string, { qnt: number; val: number; label: string }>();
     for (const r of approved) {
       const k = r.CD || "-";
-      const e = map.get(k) || { qnt: 0, val: 0 };
+      const label = cdLabel(r.CD, r.CD_Full);
+      const e = map.get(k) || { qnt: 0, val: 0, label };
       e.qnt++;
       e.val += Number(r.Valor) || 0;
       map.set(k, e);
     }
-    const rows = Array.from(map.entries())
-      .map(([cd, v]) => ({ cd, ...v, pct: totalVal ? (v.val / totalVal) * 100 : 0 }))
-      .sort((a, b) => b.val - a.val);
-    return { rows, totalQnt, totalVal };
-  }, [filtered]);
+    const rowsArr = Array.from(map.entries()).map(([cd, v]) => ({
+      cd,
+      label: v.label,
+      qnt: v.qnt,
+      val: v.val,
+      pct: totalVal ? (v.val / totalVal) * 100 : 0,
+    }));
+    const sorted = rowsArr.sort((a, b) => {
+      const av = a[cdSortKey];
+      const bv = b[cdSortKey];
+      return cdSortDir === "asc" ? av - bv : bv - av;
+    });
+    return { rows: sorted, totalQnt, totalVal };
+  }, [filtered, cdSortKey, cdSortDir]);
+
 
   // Detalhamento table
   const detalhes = useMemo(() => {
