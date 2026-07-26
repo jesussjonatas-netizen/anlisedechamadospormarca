@@ -208,25 +208,36 @@ function KpiCard({
   value,
   sub,
   color,
+  active,
+  onClick,
 }: {
   title: string;
   value: string;
   sub?: string;
   color?: string;
+  active?: boolean;
+  onClick?: () => void;
 }) {
+  const clickable = !!onClick;
   return (
-    <div
-      className="rounded-lg border-l-4 bg-panel p-4 shadow-sm"
-      style={{ borderLeftColor: color || "var(--brand)" }}
+    <button
+      type="button"
+      onClick={onClick}
+      className={`rounded-lg border-l-4 bg-panel p-4 text-left shadow-sm transition-all ${clickable ? "cursor-pointer hover:brightness-110" : "cursor-default"} ${active ? "scale-[1.03] ring-2 ring-offset-2 ring-offset-background" : ""}`}
+      style={{
+        borderLeftColor: color || "var(--brand)",
+        ...(active ? { ["--tw-ring-color" as string]: color || "var(--brand)" } : {}),
+      }}
     >
       <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
         {title}
       </div>
       <div className="mt-2 text-2xl font-bold text-foreground">{value}</div>
       {sub && <div className="mt-1 text-xs text-muted-foreground">{sub}</div>}
-    </div>
+    </button>
   );
 }
+
 
 function SectionHeader({ children }: { children: React.ReactNode }) {
   return (
