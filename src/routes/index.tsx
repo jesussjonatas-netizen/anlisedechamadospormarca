@@ -89,16 +89,26 @@ const emptyFilters: FilterState = {
   dataAte: "",
 };
 
-function normStatus(v: string | null | undefined): StatusKey | null {
-  if (!v) return null;
+function normStatus(v: string | null | undefined): StatusKey {
+  if (!v) return "Aguardando Auditoria";
   const s = v.trim().toLowerCase();
+  if (s === "") return "Aguardando Auditoria";
   if (s === "pago") return "Pago";
   if (s === "reprovado") return "Reprovado";
   if (s === "aprovado") return "Aprovado";
+  if (s.startsWith("aguardando aud")) return "Aguardando Auditoria";
   if (s.startsWith("aguardando")) return "Aguardando pagamento";
   if (s.startsWith("revis")) return "Revisão necessária";
-  return null;
+  return "Aguardando Auditoria";
 }
+
+function cdLabel(cd: string | null, cdFull?: string | null): string {
+  const full = (cdFull || cd || "").toUpperCase();
+  if (full.includes("DISTRITO FEDERAL")) return "DF";
+  if (full.includes("ANANINDEUA")) return "PA";
+  return cd || "-";
+}
+
 
 function uniq<T>(arr: (T | null | undefined)[]): T[] {
   const s = new Set<T>();
