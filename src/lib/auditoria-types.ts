@@ -28,6 +28,7 @@ export const STATUS_LIST = [
   "Aprovado",
   "Aguardando pagamento",
   "Revisão necessária",
+  "Aguardando Auditoria",
 ] as const;
 
 export type StatusKey = (typeof STATUS_LIST)[number];
@@ -38,4 +39,6 @@ export const STATUS_COLORS: Record<StatusKey, string> = {
   Aprovado: "#2ECC71",
   "Aguardando pagamento": "#F5A623",
   "Revisão necessária": "#9B59B6",
+  "Aguardando Auditoria": "#FACC15",
 };
+

@@ -35,16 +35,16 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Auditoria de Devoluções | Rede Ancora" },
+      { title: "Auditoria de Devoluções | Rede ANCORA" },
       {
         name: "description",
         content:
-          "Dashboard interno de auditoria de devoluções da Rede Ancora com KPIs, filtros e detalhamento de chamados.",
+          "Dashboard interno de auditoria de devoluções da Rede ANCORA com KPIs, filtros e detalhamento de chamados.",
       },
-      { property: "og:title", content: "Auditoria de Devoluções | Rede Ancora" },
+      { property: "og:title", content: "Auditoria de Devoluções | Rede ANCORA" },
       {
         property: "og:description",
-        content: "Painel de auditoria de devoluções da Rede Ancora.",
+        content: "Painel de auditoria de devoluções da Rede ANCORA.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -89,16 +89,26 @@ const emptyFilters: FilterState = {
   dataAte: "",
 };
 
-function normStatus(v: string | null | undefined): StatusKey | null {
-  if (!v) return null;
+function normStatus(v: string | null | undefined): StatusKey {
+  if (!v) return "Aguardando Auditoria";
   const s = v.trim().toLowerCase();
+  if (s === "") return "Aguardando Auditoria";
   if (s === "pago") return "Pago";
   if (s === "reprovado") return "Reprovado";
   if (s === "aprovado") return "Aprovado";
+  if (s.startsWith("aguardando aud")) return "Aguardando Auditoria";
   if (s.startsWith("aguardando")) return "Aguardando pagamento";
   if (s.startsWith("revis")) return "Revisão necessária";
-  return null;
+  return "Aguardando Auditoria";
 }
+
+function cdLabel(cd: string | null, cdFull?: string | null): string {
+  const full = (cdFull || cd || "").toUpperCase();
+  if (full.includes("DISTRITO FEDERAL")) return "DF";
+  if (full.includes("ANANINDEUA")) return "PA";
+  return cd || "-";
+}
+
 
 function uniq<T>(arr: (T | null | undefined)[]): T[] {
   const s = new Set<T>();
@@ -116,10 +126,11 @@ function applyFilters(rows: Solicitacao[], f: FilterState, skip?: keyof FilterSt
     if (skip !== "tipo" && f.tipo.length && !f.tipo.includes(r.Tipo || "")) return false;
     if (skip !== "status" && f.status.length) {
       const s = normStatus(r["Status Auditoria"]);
-      if (!s || !f.status.includes(s)) return false;
+      if (!f.status.includes(s)) return false;
     }
     if (skip !== "cliente" && f.cliente.length && !f.cliente.includes(r.Cliente || "")) return false;
     if (skip !== "causa" && f.causa.length && !f.causa.includes(r["Causa Raiz"] || "")) return false;
+
     if (skip !== "dataDe" && f.dataDe) {
       if (!r.Data || r.Data.slice(0, 10) < f.dataDe) return false;
     }
@@ -197,25 +208,36 @@ function KpiCard({
   value,
   sub,
   color,
+  active,
+  onClick,
 }: {
   title: string;
   value: string;
   sub?: string;
   color?: string;
+  active?: boolean;
+  onClick?: () => void;
 }) {
+  const clickable = !!onClick;
   return (
-    <div
-      className="rounded-lg border-l-4 bg-panel p-4 shadow-sm"
-      style={{ borderLeftColor: color || "var(--brand)" }}
+    <button
+      type="button"
+      onClick={onClick}
+      className={`rounded-lg border-l-4 bg-panel p-4 text-left shadow-sm transition-all ${clickable ? "cursor-pointer hover:brightness-110" : "cursor-default"} ${active ? "scale-[1.03] ring-2 ring-offset-2 ring-offset-background" : ""}`}
+      style={{
+        borderLeftColor: color || "var(--brand)",
+        ...(active ? { ["--tw-ring-color" as string]: color || "var(--brand)" } : {}),
+      }}
     >
       <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
         {title}
       </div>
       <div className="mt-2 text-2xl font-bold text-foreground">{value}</div>
       {sub && <div className="mt-1 text-xs text-muted-foreground">{sub}</div>}
-    </div>
+    </button>
   );
 }
+
 
 function SectionHeader({ children }: { children: React.ReactNode }) {
   return (
@@ -230,8 +252,11 @@ function Dashboard() {
   const [filters, setFilters] = useState<FilterState>(emptyFilters);
   const [sortKey, setSortKey] = useState<string>("Valor");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const [cdSortKey, setCdSortKey] = useState<"qnt" | "val">("val");
+  const [cdSortDir, setCdSortDir] = useState<"asc" | "desc">("desc");
   const [page, setPage] = useState(1);
   const fileRef = useRef<HTMLInputElement>(null);
+
 
   const filtered = useMemo(() => applyFilters(rows, filters), [rows, filters]);
 
@@ -263,15 +288,15 @@ function Dashboard() {
       Aprovado: 0,
       "Aguardando pagamento": 0,
       "Revisão necessária": 0,
+      "Aguardando Auditoria": 0,
     };
     const valorByStatus: Record<StatusKey, number> = { ...byStatus };
     for (const r of filtered) {
       const s = normStatus(r["Status Auditoria"]);
-      if (s) {
-        byStatus[s]++;
-        valorByStatus[s] += Number(r.Valor) || 0;
-      }
+      byStatus[s]++;
+      valorByStatus[s] += Number(r.Valor) || 0;
     }
+
     return { total, valor, byStatus, valorByStatus };
   }, [filtered]);
 
@@ -288,19 +313,30 @@ function Dashboard() {
     const approved = filtered.filter((r) => normStatus(r["Status Auditoria"]) === "Aprovado");
     const totalQnt = approved.length;
     const totalVal = approved.reduce((s, r) => s + (Number(r.Valor) || 0), 0);
-    const map = new Map<string, { qnt: number; val: number }>();
+    const map = new Map<string, { qnt: number; val: number; label: string }>();
     for (const r of approved) {
       const k = r.CD || "-";
-      const e = map.get(k) || { qnt: 0, val: 0 };
+      const label = cdLabel(r.CD, r.CD_Full);
+      const e = map.get(k) || { qnt: 0, val: 0, label };
       e.qnt++;
       e.val += Number(r.Valor) || 0;
       map.set(k, e);
     }
-    const rows = Array.from(map.entries())
-      .map(([cd, v]) => ({ cd, ...v, pct: totalVal ? (v.val / totalVal) * 100 : 0 }))
-      .sort((a, b) => b.val - a.val);
-    return { rows, totalQnt, totalVal };
-  }, [filtered]);
+    const rowsArr = Array.from(map.entries()).map(([cd, v]) => ({
+      cd,
+      label: v.label,
+      qnt: v.qnt,
+      val: v.val,
+      pct: totalVal ? (v.val / totalVal) * 100 : 0,
+    }));
+    const sorted = rowsArr.sort((a, b) => {
+      const av = a[cdSortKey];
+      const bv = b[cdSortKey];
+      return cdSortDir === "asc" ? av - bv : bv - av;
+    });
+    return { rows: sorted, totalQnt, totalVal };
+  }, [filtered, cdSortKey, cdSortDir]);
+
 
   // Detalhamento table
   const detalhes = useMemo(() => {
@@ -433,12 +469,13 @@ function Dashboard() {
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand text-[10px] font-bold uppercase leading-tight text-white">
             Rede
             <br />
-            Ancora
+            ANCORA
           </div>
           <div>
-            <div className="text-sm font-bold">Rede Ancora</div>
+            <div className="text-sm font-bold">Rede ANCORA</div>
             <div className="text-[11px] text-muted-foreground">Auditoria HD</div>
           </div>
+
         </div>
 
         <nav className="border-b border-border p-2">
@@ -537,7 +574,7 @@ function Dashboard() {
               AUDITORIA DE DEVOLUÇÕES
             </h1>
             <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-              Rede Ancora
+              Rede ANCORA
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -604,27 +641,39 @@ function Dashboard() {
           {/* KPIs */}
           <section>
             <SectionHeader>Auditoria de Chamados</SectionHeader>
-            <div className="grid grid-cols-2 gap-3 rounded-b-lg bg-panel/50 p-4 md:grid-cols-4 xl:grid-cols-7">
+            <div className="grid grid-cols-2 gap-3 rounded-b-lg bg-panel/50 p-4 md:grid-cols-4 xl:grid-cols-8">
               <KpiCard
-                title="Total de Chamados"
+                title="Total de Chamados Analisados"
                 value={fmtInt(kpi.total)}
-                color="var(--brand)"
+                color="#ffffff"
+                active={filters.status.length === 0}
+                onClick={() => setFilters((f) => ({ ...f, status: [] }))}
               />
               <KpiCard
                 title="Valor Total Analisado"
                 value={fmtBRL(kpi.valor)}
-                color="var(--brand)"
+                color="#ffffff"
+                active={filters.status.length === 0}
+                onClick={() => setFilters((f) => ({ ...f, status: [] }))}
               />
-              {STATUS_LIST.map((s) => (
-                <KpiCard
-                  key={s}
-                  title={s}
-                  value={fmtInt(kpi.byStatus[s])}
-                  sub={`${pct(kpi.byStatus[s], kpi.total)} do total`}
-                  color={STATUS_COLORS[s]}
-                />
-              ))}
+              {STATUS_LIST.map((s) => {
+                const isActive = filters.status.length === 1 && filters.status[0] === s;
+                return (
+                  <KpiCard
+                    key={s}
+                    title={s}
+                    value={fmtInt(kpi.byStatus[s])}
+                    sub={`${pct(kpi.byStatus[s], kpi.total)} do total`}
+                    color={STATUS_COLORS[s]}
+                    active={isActive}
+                    onClick={() =>
+                      setFilters((f) => ({ ...f, status: isActive ? [] : [s] }))
+                    }
+                  />
+                );
+              })}
             </div>
+
           </section>
 
           {/* Charts */}
@@ -714,8 +763,30 @@ function Dashboard() {
                 <thead>
                   <tr className="bg-secondary text-left text-xs uppercase tracking-wider text-muted-foreground">
                     <th className="px-4 py-2">CD</th>
-                    <th className="px-4 py-2 text-right">Qnt. Cham.</th>
-                    <th className="px-4 py-2 text-right">Valor</th>
+                    <th
+                      className="cursor-pointer select-none px-4 py-2 text-right hover:text-white"
+                      onClick={() => {
+                        if (cdSortKey === "qnt") setCdSortDir((d) => (d === "asc" ? "desc" : "asc"));
+                        else {
+                          setCdSortKey("qnt");
+                          setCdSortDir("desc");
+                        }
+                      }}
+                    >
+                      Qnt. Cham.{cdSortKey === "qnt" ? (cdSortDir === "asc" ? " ▲" : " ▼") : ""}
+                    </th>
+                    <th
+                      className="cursor-pointer select-none px-4 py-2 text-right hover:text-white"
+                      onClick={() => {
+                        if (cdSortKey === "val") setCdSortDir((d) => (d === "asc" ? "desc" : "asc"));
+                        else {
+                          setCdSortKey("val");
+                          setCdSortDir("desc");
+                        }
+                      }}
+                    >
+                      Valor{cdSortKey === "val" ? (cdSortDir === "asc" ? " ▲" : " ▼") : ""}
+                    </th>
                     <th className="px-4 py-2 text-right">%</th>
                   </tr>
                 </thead>
@@ -729,7 +800,7 @@ function Dashboard() {
                   ) : (
                     aprovadosPorCd.rows.map((r) => (
                       <tr key={r.cd} className="border-t border-border/60 hover:bg-secondary/50">
-                        <td className="px-4 py-2 font-medium">{r.cd}</td>
+                        <td className="px-4 py-2 font-medium" title={r.cd}>{r.label}</td>
                         <td className="px-4 py-2 text-right">{fmtInt(r.qnt)}</td>
                         <td className="px-4 py-2 text-right">{fmtBRL(r.val)}</td>
                         <td className="px-4 py-2 text-right">{r.pct.toFixed(1)}%</td>
@@ -737,6 +808,7 @@ function Dashboard() {
                     ))
                   )}
                 </tbody>
+
                 {aprovadosPorCd.rows.length > 0 && (
                   <tfoot>
                     <tr className="border-t border-border bg-[var(--panel-header)] font-bold">
@@ -857,7 +929,7 @@ function Dashboard() {
         {/* Footer */}
         <footer className="flex flex-wrap items-center justify-between gap-2 border-t border-border bg-panel px-6 py-3 text-[11px] text-muted-foreground">
           <span>
-            Fonte: Sistema HD - Rede Ancora | Dados extraídos do B2B. Valores exibidos sem impostos,
+            Fonte: Sistema HD - Rede ANCORA | Dados extraídos do B2B. Valores exibidos sem impostos,
             podendo apresentar variações.
           </span>
           <span className="inline-flex items-center gap-1">
