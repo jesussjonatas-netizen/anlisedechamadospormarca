@@ -1,15 +1,6 @@
-import { create } from "zustand";
+import { useSyncExternalStore } from "react";
 import type { Solicitacao } from "./auditoria-types";
 import rawData from "@/data/solicitacoes.json";
-
-interface DataStore {
-  rows: Solicitacao[];
-  lastUpdate: Date;
-  setRows: (rows: Solicitacao[]) => void;
-}
-
-// Zustand is not installed; use a simple module-level store with React hook.
-import { useSyncExternalStore } from "react";
 
 const listeners = new Set<() => void>();
 let state: { rows: Solicitacao[]; lastUpdate: Date } = {
@@ -38,7 +29,3 @@ function getSnapshot() {
 export function useAuditoriaData() {
   return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 }
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-type _unused = DataStore;
-export { create };
