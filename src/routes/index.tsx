@@ -685,14 +685,15 @@ function Dashboard() {
             <SectionHeader>Auditoria de Chamados</SectionHeader>
             <div className="grid grid-cols-2 gap-3 rounded-b-lg bg-panel/50 p-4 md:grid-cols-4 xl:grid-cols-8">
               <KpiCard
-                title="Total de Chamados Analisados"
+                title="Total de chamados"
                 value={fmtInt(kpi.total)}
+                sub={fmtBRL(kpi.valor)}
                 color="#ffffff"
                 active={filters.status.length === 0}
                 onClick={() => setFilters((f) => ({ ...f, status: [] }))}
               />
               <KpiCard
-                title="Valor Total Analisado"
+                title="Valor total"
                 value={fmtBRL(kpi.valor)}
                 color="#ffffff"
                 active={filters.status.length === 0}
@@ -705,7 +706,7 @@ function Dashboard() {
                     key={s}
                     title={s}
                     value={fmtInt(kpi.byStatus[s])}
-                    sub={`${pct(kpi.byStatus[s], kpi.total)} do total`}
+                    sub={`${pct(kpi.byStatus[s], kpi.total)} · ${fmtBRL(kpi.valorByStatus[s])}`}
                     color={STATUS_COLORS[s]}
                     active={isActive}
                     onClick={() =>
