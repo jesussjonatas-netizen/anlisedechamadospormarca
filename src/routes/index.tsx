@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState, useRef } from "react";
+import { useMemo, useState, useRef, useCallback } from "react";
 import * as XLSX from "xlsx";
 import {
   PieChart,
@@ -21,7 +21,6 @@ import {
   ListChecks,
   Filter as FilterIcon,
   ChevronDown,
-  Calendar,
   Check,
 } from "lucide-react";
 import { useAuditoriaData, setRows } from "@/lib/auditoria-store";
@@ -31,6 +30,40 @@ import {
   type Solicitacao,
   type StatusKey,
 } from "@/lib/auditoria-types";
+import ancoraLogo from "@/assets/ancora-logo.png";
+
+// hook for Excel-style resizable columns
+function useColWidths(defaults: Record<string, number>) {
+  const [widths, setWidths] = useState<Record<string, number>>(defaults);
+  const startResize = useCallback((key: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const startX = e.clientX;
+    const startW = widths[key] ?? 120;
+    const onMove = (ev: MouseEvent) => {
+      const w = Math.max(50, startW + (ev.clientX - startX));
+      setWidths((s) => ({ ...s, [key]: w }));
+    };
+    const onUp = () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  }, [widths]);
+  return { widths, startResize };
+}
+
+function ResizeHandle({ onMouseDown }: { onMouseDown: (e: React.MouseEvent) => void }) {
+  return (
+    <span
+      onMouseDown={onMouseDown}
+      onClick={(e) => e.stopPropagation()}
+      className="absolute right-0 top-0 h-full w-1 cursor-col-resize select-none hover:bg-brand"
+      style={{ userSelect: "none" }}
+    />
+  );
+}
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -147,15 +180,18 @@ function MultiSelect({
   options,
   value,
   onChange,
+  labelMap,
 }: {
   label: string;
   options: string[];
   value: string[];
   onChange: (v: string[]) => void;
+  labelMap?: (v: string) => string;
 }) {
   const [open, setOpen] = useState(false);
+  const disp = (v: string) => (labelMap ? labelMap(v) : v);
   const summary =
-    value.length === 0 ? "Todos" : value.length === 1 ? value[0] : `${value.length} selecionados`;
+    value.length === 0 ? "Todos" : value.length === 1 ? disp(value[0]) : `${value.length} selecionados`;
   return (
     <div className="relative">
       <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
@@ -192,7 +228,7 @@ function MultiSelect({
                   >
                     {active && <Check className="h-3 w-3 text-white" />}
                   </span>
-                  <span className="truncate">{opt}</span>
+                  <span className="truncate" title={opt}>{disp(opt)}</span>
                 </button>
               );
             })}
@@ -306,7 +342,9 @@ function Dashboard() {
   const barData = STATUS_LIST.map((s) => ({
     name: s,
     value: kpi.valorByStatus[s],
-  })).filter((d) => d.value > 0);
+  }))
+    .filter((d) => d.value > 0)
+    .sort((a, b) => b.value - a.value);
 
   // Aprovados por CD
   const aprovadosPorCd = useMemo(() => {
@@ -364,7 +402,6 @@ function Dashboard() {
     { key: "Id Portal", label: "Id Portal" },
     { key: "NFD", label: "NFD" },
     { key: "Cliente", label: "Cliente" },
-    { key: "Região", label: "Região" },
     { key: "CD", label: "CD" },
     { key: "NF", label: "NF" },
     { key: "Valor", label: "Valor" },
@@ -373,6 +410,14 @@ function Dashboard() {
     { key: "Causa Raiz", label: "Causa Raiz" },
     { key: "OBS REPROVAÇÃO/APROVAÇÃO:", label: "OBS Reprovação/Aprovação" },
   ];
+
+  // Resizable column widths
+  const detWidths = useColWidths({
+    "Id Portal": 90, NFD: 90, Cliente: 220, CD: 80, NF: 90, Valor: 110,
+    Modalidade: 120, Tipo: 120, "Causa Raiz": 150,
+    "OBS REPROVAÇÃO/APROVAÇÃO:": 260, Status: 160,
+  });
+  const cdWidths = useColWidths({ cd: 220, qnt: 140, val: 180, pct: 100 });
 
   const toggleSort = (k: string) => {
     if (sortKey === k) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
@@ -465,17 +510,8 @@ function Dashboard() {
     <div className="flex min-h-screen bg-background text-foreground">
       {/* Sidebar */}
       <aside className="flex w-72 flex-shrink-0 flex-col border-r border-border bg-panel">
-        <div className="flex items-center gap-3 border-b border-border px-4 py-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand text-[10px] font-bold uppercase leading-tight text-white">
-            Rede
-            <br />
-            ANCORA
-          </div>
-          <div>
-            <div className="text-sm font-bold">Rede ANCORA</div>
-            <div className="text-[11px] text-muted-foreground">Auditoria HD</div>
-          </div>
-
+        <div className="flex items-center justify-center border-b border-border px-4 py-4">
+          <img src={ancoraLogo} alt="ANCORA" className="h-12 w-auto" />
         </div>
 
         <nav className="border-b border-border p-2">
@@ -499,6 +535,7 @@ function Dashboard() {
               options={opts.cd}
               value={filters.cd}
               onChange={(v) => setFilters((f) => ({ ...f, cd: v }))}
+              labelMap={(v) => cdLabel(v, v)}
             />
             <MultiSelect
               label="Região"
@@ -573,9 +610,6 @@ function Dashboard() {
             <h1 className="text-xl font-bold tracking-wide text-white">
               AUDITORIA DE DEVOLUÇÕES
             </h1>
-            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-              Rede ANCORA
-            </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <div className="flex items-center gap-1">
@@ -594,18 +628,27 @@ function Dashboard() {
               </select>
             </div>
             <div className="flex items-center gap-1">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
+              <span className="text-[11px] font-semibold uppercase text-muted-foreground">Mês</span>
               <input
-                type="date"
-                value={filters.dataDe}
-                onChange={(e) => setFilters((f) => ({ ...f, dataDe: e.target.value }))}
-                className="rounded-md border border-border bg-input px-2 py-1.5 text-sm text-foreground"
-              />
-              <span className="text-muted-foreground">→</span>
-              <input
-                type="date"
-                value={filters.dataAte}
-                onChange={(e) => setFilters((f) => ({ ...f, dataAte: e.target.value }))}
+                type="month"
+                value={
+                  filters.dataDe && filters.dataDe.length >= 7 ? filters.dataDe.slice(0, 7) : ""
+                }
+                onChange={(e) => {
+                  const v = e.target.value; // YYYY-MM
+                  if (!v) {
+                    setFilters((f) => ({ ...f, dataDe: "", dataAte: "" }));
+                    return;
+                  }
+                  const [y, m] = v.split("-").map(Number);
+                  const last = new Date(y, m, 0).getDate();
+                  const mm = String(m).padStart(2, "0");
+                  setFilters((f) => ({
+                    ...f,
+                    dataDe: `${y}-${mm}-01`,
+                    dataAte: `${y}-${mm}-${String(last).padStart(2, "0")}`,
+                  }));
+                }}
                 className="rounded-md border border-border bg-input px-2 py-1.5 text-sm text-foreground"
               />
             </div>
@@ -643,14 +686,15 @@ function Dashboard() {
             <SectionHeader>Auditoria de Chamados</SectionHeader>
             <div className="grid grid-cols-2 gap-3 rounded-b-lg bg-panel/50 p-4 md:grid-cols-4 xl:grid-cols-8">
               <KpiCard
-                title="Total de Chamados Analisados"
+                title="Total de chamados"
                 value={fmtInt(kpi.total)}
+                sub={fmtBRL(kpi.valor)}
                 color="#ffffff"
                 active={filters.status.length === 0}
                 onClick={() => setFilters((f) => ({ ...f, status: [] }))}
               />
               <KpiCard
-                title="Valor Total Analisado"
+                title="Valor total"
                 value={fmtBRL(kpi.valor)}
                 color="#ffffff"
                 active={filters.status.length === 0}
@@ -663,7 +707,7 @@ function Dashboard() {
                     key={s}
                     title={s}
                     value={fmtInt(kpi.byStatus[s])}
-                    sub={`${pct(kpi.byStatus[s], kpi.total)} do total`}
+                    sub={`${pct(kpi.byStatus[s], kpi.total)} · ${fmtBRL(kpi.valorByStatus[s])}`}
                     color={STATUS_COLORS[s]}
                     active={isActive}
                     onClick={() =>
@@ -759,12 +803,21 @@ function Dashboard() {
           <section className="rounded-lg bg-panel">
             <SectionHeader>Aprovados por CD</SectionHeader>
             <div className="overflow-auto">
-              <table className="w-full text-sm">
+              <table className="w-full text-sm" style={{ tableLayout: "fixed" }}>
+                <colgroup>
+                  <col style={{ width: cdWidths.widths.cd }} />
+                  <col style={{ width: cdWidths.widths.qnt }} />
+                  <col style={{ width: cdWidths.widths.val }} />
+                  <col style={{ width: cdWidths.widths.pct }} />
+                </colgroup>
                 <thead>
                   <tr className="bg-secondary text-left text-xs uppercase tracking-wider text-muted-foreground">
-                    <th className="px-4 py-2">CD</th>
+                    <th className="relative px-4 py-2">
+                      CD
+                      <ResizeHandle onMouseDown={(e) => cdWidths.startResize("cd", e)} />
+                    </th>
                     <th
-                      className="cursor-pointer select-none px-4 py-2 text-right hover:text-white"
+                      className="relative cursor-pointer select-none px-4 py-2 text-right hover:text-white"
                       onClick={() => {
                         if (cdSortKey === "qnt") setCdSortDir((d) => (d === "asc" ? "desc" : "asc"));
                         else {
@@ -774,9 +827,10 @@ function Dashboard() {
                       }}
                     >
                       Qnt. Cham.{cdSortKey === "qnt" ? (cdSortDir === "asc" ? " ▲" : " ▼") : ""}
+                      <ResizeHandle onMouseDown={(e) => cdWidths.startResize("qnt", e)} />
                     </th>
                     <th
-                      className="cursor-pointer select-none px-4 py-2 text-right hover:text-white"
+                      className="relative cursor-pointer select-none px-4 py-2 text-right hover:text-white"
                       onClick={() => {
                         if (cdSortKey === "val") setCdSortDir((d) => (d === "asc" ? "desc" : "asc"));
                         else {
@@ -786,8 +840,12 @@ function Dashboard() {
                       }}
                     >
                       Valor{cdSortKey === "val" ? (cdSortDir === "asc" ? " ▲" : " ▼") : ""}
+                      <ResizeHandle onMouseDown={(e) => cdWidths.startResize("val", e)} />
                     </th>
-                    <th className="px-4 py-2 text-right">%</th>
+                    <th className="relative px-4 py-2 text-right">
+                      %
+                      <ResizeHandle onMouseDown={(e) => cdWidths.startResize("pct", e)} />
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -800,7 +858,7 @@ function Dashboard() {
                   ) : (
                     aprovadosPorCd.rows.map((r) => (
                       <tr key={r.cd} className="border-t border-border/60 hover:bg-secondary/50">
-                        <td className="px-4 py-2 font-medium" title={r.cd}>{r.label}</td>
+                        <td className="truncate px-4 py-2 font-medium" title={r.cd}>{r.label}</td>
                         <td className="px-4 py-2 text-right">{fmtInt(r.qnt)}</td>
                         <td className="px-4 py-2 text-right">{fmtBRL(r.val)}</td>
                         <td className="px-4 py-2 text-right">{r.pct.toFixed(1)}%</td>
@@ -827,20 +885,35 @@ function Dashboard() {
           <section className="rounded-lg bg-panel">
             <SectionHeader>Detalhamento de Chamados</SectionHeader>
             <div className="overflow-auto">
-              <table className="w-full text-xs">
+              <table className="w-full text-xs" style={{ tableLayout: "fixed" }}>
+                <colgroup>
+                  {detColumns.map((c) => (
+                    <col
+                      key={c.key as string}
+                      style={{ width: detWidths.widths[c.key as string] }}
+                    />
+                  ))}
+                  <col style={{ width: detWidths.widths.Status }} />
+                </colgroup>
                 <thead>
                   <tr className="bg-secondary text-left uppercase tracking-wider text-muted-foreground">
                     {detColumns.map((c) => (
                       <th
                         key={c.key as string}
-                        className="cursor-pointer whitespace-nowrap px-3 py-2 hover:text-white"
+                        className="relative cursor-pointer whitespace-nowrap px-3 py-2 hover:text-white"
                         onClick={() => toggleSort(c.key as string)}
                       >
                         {c.label}
                         {sortKey === (c.key as string) && (sortDir === "asc" ? " ▲" : " ▼")}
+                        <ResizeHandle
+                          onMouseDown={(e) => detWidths.startResize(c.key as string, e)}
+                        />
                       </th>
                     ))}
-                    <th className="px-3 py-2">Status</th>
+                    <th className="relative px-3 py-2">
+                      Status
+                      <ResizeHandle onMouseDown={(e) => detWidths.startResize("Status", e)} />
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -866,13 +939,15 @@ function Dashboard() {
                             const display =
                               c.key === "Valor"
                                 ? fmtBRL(Number(v) || 0)
-                                : v == null
-                                  ? "-"
-                                  : String(v);
+                                : c.key === "CD"
+                                  ? cdLabel(r.CD, r.CD_Full)
+                                  : v == null
+                                    ? "-"
+                                    : String(v);
                             return (
                               <td
                                 key={c.key as string}
-                                className={`whitespace-nowrap px-3 py-2 ${c.key === "Valor" ? "text-right font-mono" : ""} ${c.key === "Cliente" || c.key === "OBS REPROVAÇÃO/APROVAÇÃO:" ? "max-w-[240px] truncate" : ""}`}
+                                className={`truncate whitespace-nowrap px-3 py-2 ${c.key === "Valor" ? "text-right font-mono" : ""}`}
                                 title={String(v ?? "")}
                               >
                                 {display}
