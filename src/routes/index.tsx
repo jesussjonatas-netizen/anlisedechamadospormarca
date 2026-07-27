@@ -402,7 +402,6 @@ function Dashboard() {
     { key: "Id Portal", label: "Id Portal" },
     { key: "NFD", label: "NFD" },
     { key: "Cliente", label: "Cliente" },
-    { key: "Região", label: "Região" },
     { key: "CD", label: "CD" },
     { key: "NF", label: "NF" },
     { key: "Valor", label: "Valor" },
@@ -411,6 +410,14 @@ function Dashboard() {
     { key: "Causa Raiz", label: "Causa Raiz" },
     { key: "OBS REPROVAÇÃO/APROVAÇÃO:", label: "OBS Reprovação/Aprovação" },
   ];
+
+  // Resizable column widths
+  const detWidths = useColWidths({
+    "Id Portal": 90, NFD: 90, Cliente: 220, CD: 80, NF: 90, Valor: 110,
+    Modalidade: 120, Tipo: 120, "Causa Raiz": 150,
+    "OBS REPROVAÇÃO/APROVAÇÃO:": 260, Status: 160,
+  });
+  const cdWidths = useColWidths({ cd: 220, qnt: 140, val: 180, pct: 100 });
 
   const toggleSort = (k: string) => {
     if (sortKey === k) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
