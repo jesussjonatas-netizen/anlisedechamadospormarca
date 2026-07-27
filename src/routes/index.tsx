@@ -535,6 +535,7 @@ function Dashboard() {
               options={opts.cd}
               value={filters.cd}
               onChange={(v) => setFilters((f) => ({ ...f, cd: v }))}
+              labelMap={(v) => cdLabel(v, v)}
             />
             <MultiSelect
               label="Região"
