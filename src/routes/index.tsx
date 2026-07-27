@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState, useRef } from "react";
+import { useMemo, useState, useRef, useCallback } from "react";
 import * as XLSX from "xlsx";
 import {
   PieChart,
@@ -21,7 +21,6 @@ import {
   ListChecks,
   Filter as FilterIcon,
   ChevronDown,
-  Calendar,
   Check,
 } from "lucide-react";
 import { useAuditoriaData, setRows } from "@/lib/auditoria-store";
@@ -31,6 +30,40 @@ import {
   type Solicitacao,
   type StatusKey,
 } from "@/lib/auditoria-types";
+import ancoraLogo from "@/assets/ancora-logo.png";
+
+// hook for Excel-style resizable columns
+function useColWidths(defaults: Record<string, number>) {
+  const [widths, setWidths] = useState<Record<string, number>>(defaults);
+  const startResize = useCallback((key: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const startX = e.clientX;
+    const startW = widths[key] ?? 120;
+    const onMove = (ev: MouseEvent) => {
+      const w = Math.max(50, startW + (ev.clientX - startX));
+      setWidths((s) => ({ ...s, [key]: w }));
+    };
+    const onUp = () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  }, [widths]);
+  return { widths, startResize };
+}
+
+function ResizeHandle({ onMouseDown }: { onMouseDown: (e: React.MouseEvent) => void }) {
+  return (
+    <span
+      onMouseDown={onMouseDown}
+      onClick={(e) => e.stopPropagation()}
+      className="absolute right-0 top-0 h-full w-1 cursor-col-resize select-none hover:bg-brand"
+      style={{ userSelect: "none" }}
+    />
+  );
+}
 
 export const Route = createFileRoute("/")({
   head: () => ({
