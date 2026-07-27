@@ -803,12 +803,21 @@ function Dashboard() {
           <section className="rounded-lg bg-panel">
             <SectionHeader>Aprovados por CD</SectionHeader>
             <div className="overflow-auto">
-              <table className="w-full text-sm">
+              <table className="w-full text-sm" style={{ tableLayout: "fixed" }}>
+                <colgroup>
+                  <col style={{ width: cdWidths.widths.cd }} />
+                  <col style={{ width: cdWidths.widths.qnt }} />
+                  <col style={{ width: cdWidths.widths.val }} />
+                  <col style={{ width: cdWidths.widths.pct }} />
+                </colgroup>
                 <thead>
                   <tr className="bg-secondary text-left text-xs uppercase tracking-wider text-muted-foreground">
-                    <th className="px-4 py-2">CD</th>
+                    <th className="relative px-4 py-2">
+                      CD
+                      <ResizeHandle onMouseDown={(e) => cdWidths.startResize("cd", e)} />
+                    </th>
                     <th
-                      className="cursor-pointer select-none px-4 py-2 text-right hover:text-white"
+                      className="relative cursor-pointer select-none px-4 py-2 text-right hover:text-white"
                       onClick={() => {
                         if (cdSortKey === "qnt") setCdSortDir((d) => (d === "asc" ? "desc" : "asc"));
                         else {
@@ -818,9 +827,10 @@ function Dashboard() {
                       }}
                     >
                       Qnt. Cham.{cdSortKey === "qnt" ? (cdSortDir === "asc" ? " ▲" : " ▼") : ""}
+                      <ResizeHandle onMouseDown={(e) => cdWidths.startResize("qnt", e)} />
                     </th>
                     <th
-                      className="cursor-pointer select-none px-4 py-2 text-right hover:text-white"
+                      className="relative cursor-pointer select-none px-4 py-2 text-right hover:text-white"
                       onClick={() => {
                         if (cdSortKey === "val") setCdSortDir((d) => (d === "asc" ? "desc" : "asc"));
                         else {
@@ -830,8 +840,12 @@ function Dashboard() {
                       }}
                     >
                       Valor{cdSortKey === "val" ? (cdSortDir === "asc" ? " ▲" : " ▼") : ""}
+                      <ResizeHandle onMouseDown={(e) => cdWidths.startResize("val", e)} />
                     </th>
-                    <th className="px-4 py-2 text-right">%</th>
+                    <th className="relative px-4 py-2 text-right">
+                      %
+                      <ResizeHandle onMouseDown={(e) => cdWidths.startResize("pct", e)} />
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -844,7 +858,7 @@ function Dashboard() {
                   ) : (
                     aprovadosPorCd.rows.map((r) => (
                       <tr key={r.cd} className="border-t border-border/60 hover:bg-secondary/50">
-                        <td className="px-4 py-2 font-medium" title={r.cd}>{r.label}</td>
+                        <td className="truncate px-4 py-2 font-medium" title={r.cd}>{r.label}</td>
                         <td className="px-4 py-2 text-right">{fmtInt(r.qnt)}</td>
                         <td className="px-4 py-2 text-right">{fmtBRL(r.val)}</td>
                         <td className="px-4 py-2 text-right">{r.pct.toFixed(1)}%</td>
