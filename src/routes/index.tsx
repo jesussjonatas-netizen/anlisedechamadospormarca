@@ -885,20 +885,35 @@ function Dashboard() {
           <section className="rounded-lg bg-panel">
             <SectionHeader>Detalhamento de Chamados</SectionHeader>
             <div className="overflow-auto">
-              <table className="w-full text-xs">
+              <table className="w-full text-xs" style={{ tableLayout: "fixed" }}>
+                <colgroup>
+                  {detColumns.map((c) => (
+                    <col
+                      key={c.key as string}
+                      style={{ width: detWidths.widths[c.key as string] }}
+                    />
+                  ))}
+                  <col style={{ width: detWidths.widths.Status }} />
+                </colgroup>
                 <thead>
                   <tr className="bg-secondary text-left uppercase tracking-wider text-muted-foreground">
                     {detColumns.map((c) => (
                       <th
                         key={c.key as string}
-                        className="cursor-pointer whitespace-nowrap px-3 py-2 hover:text-white"
+                        className="relative cursor-pointer whitespace-nowrap px-3 py-2 hover:text-white"
                         onClick={() => toggleSort(c.key as string)}
                       >
                         {c.label}
                         {sortKey === (c.key as string) && (sortDir === "asc" ? " ▲" : " ▼")}
+                        <ResizeHandle
+                          onMouseDown={(e) => detWidths.startResize(c.key as string, e)}
+                        />
                       </th>
                     ))}
-                    <th className="px-3 py-2">Status</th>
+                    <th className="relative px-3 py-2">
+                      Status
+                      <ResizeHandle onMouseDown={(e) => detWidths.startResize("Status", e)} />
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -924,13 +939,15 @@ function Dashboard() {
                             const display =
                               c.key === "Valor"
                                 ? fmtBRL(Number(v) || 0)
-                                : v == null
-                                  ? "-"
-                                  : String(v);
+                                : c.key === "CD"
+                                  ? cdLabel(r.CD, r.CD_Full)
+                                  : v == null
+                                    ? "-"
+                                    : String(v);
                             return (
                               <td
                                 key={c.key as string}
-                                className={`whitespace-nowrap px-3 py-2 ${c.key === "Valor" ? "text-right font-mono" : ""} ${c.key === "Cliente" || c.key === "OBS REPROVAÇÃO/APROVAÇÃO:" ? "max-w-[240px] truncate" : ""}`}
+                                className={`truncate whitespace-nowrap px-3 py-2 ${c.key === "Valor" ? "text-right font-mono" : ""}`}
                                 title={String(v ?? "")}
                               >
                                 {display}
