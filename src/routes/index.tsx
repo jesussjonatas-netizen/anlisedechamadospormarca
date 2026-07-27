@@ -180,15 +180,18 @@ function MultiSelect({
   options,
   value,
   onChange,
+  labelMap,
 }: {
   label: string;
   options: string[];
   value: string[];
   onChange: (v: string[]) => void;
+  labelMap?: (v: string) => string;
 }) {
   const [open, setOpen] = useState(false);
+  const disp = (v: string) => (labelMap ? labelMap(v) : v);
   const summary =
-    value.length === 0 ? "Todos" : value.length === 1 ? value[0] : `${value.length} selecionados`;
+    value.length === 0 ? "Todos" : value.length === 1 ? disp(value[0]) : `${value.length} selecionados`;
   return (
     <div className="relative">
       <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
@@ -225,7 +228,7 @@ function MultiSelect({
                   >
                     {active && <Check className="h-3 w-3 text-white" />}
                   </span>
-                  <span className="truncate">{opt}</span>
+                  <span className="truncate" title={opt}>{disp(opt)}</span>
                 </button>
               );
             })}
