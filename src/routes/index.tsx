@@ -609,9 +609,6 @@ function Dashboard() {
             <h1 className="text-xl font-bold tracking-wide text-white">
               AUDITORIA DE DEVOLUÇÕES
             </h1>
-            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-              Rede ANCORA
-            </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <div className="flex items-center gap-1">
@@ -630,18 +627,27 @@ function Dashboard() {
               </select>
             </div>
             <div className="flex items-center gap-1">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
+              <span className="text-[11px] font-semibold uppercase text-muted-foreground">Mês</span>
               <input
-                type="date"
-                value={filters.dataDe}
-                onChange={(e) => setFilters((f) => ({ ...f, dataDe: e.target.value }))}
-                className="rounded-md border border-border bg-input px-2 py-1.5 text-sm text-foreground"
-              />
-              <span className="text-muted-foreground">→</span>
-              <input
-                type="date"
-                value={filters.dataAte}
-                onChange={(e) => setFilters((f) => ({ ...f, dataAte: e.target.value }))}
+                type="month"
+                value={
+                  filters.dataDe && filters.dataDe.length >= 7 ? filters.dataDe.slice(0, 7) : ""
+                }
+                onChange={(e) => {
+                  const v = e.target.value; // YYYY-MM
+                  if (!v) {
+                    setFilters((f) => ({ ...f, dataDe: "", dataAte: "" }));
+                    return;
+                  }
+                  const [y, m] = v.split("-").map(Number);
+                  const last = new Date(y, m, 0).getDate();
+                  const mm = String(m).padStart(2, "0");
+                  setFilters((f) => ({
+                    ...f,
+                    dataDe: `${y}-${mm}-01`,
+                    dataAte: `${y}-${mm}-${String(last).padStart(2, "0")}`,
+                  }));
+                }}
                 className="rounded-md border border-border bg-input px-2 py-1.5 text-sm text-foreground"
               />
             </div>
