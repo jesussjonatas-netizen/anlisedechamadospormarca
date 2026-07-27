@@ -342,7 +342,9 @@ function Dashboard() {
   const barData = STATUS_LIST.map((s) => ({
     name: s,
     value: kpi.valorByStatus[s],
-  })).filter((d) => d.value > 0);
+  }))
+    .filter((d) => d.value > 0)
+    .sort((a, b) => b.value - a.value);
 
   // Aprovados por CD
   const aprovadosPorCd = useMemo(() => {
