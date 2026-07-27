@@ -617,7 +617,8 @@ function Dashboard() {
       <main className="flex min-w-0 flex-1 flex-col">
         {/* Header */}
         <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-panel px-6 py-4">
-          <div>
+          <div className="flex items-center gap-4">
+            <img src={ancoraLogo} alt="Rede ANCORA" className="h-12 w-auto" />
             <h1 className="text-xl font-bold tracking-wide text-white">
               AUDITORIA DE DEVOLUÇÕES
             </h1>
@@ -640,13 +641,12 @@ function Dashboard() {
             </div>
             <div className="flex items-center gap-1">
               <span className="text-[11px] font-semibold uppercase text-muted-foreground">Mês</span>
-              <input
-                type="month"
+              <select
                 value={
                   filters.dataDe && filters.dataDe.length >= 7 ? filters.dataDe.slice(0, 7) : ""
                 }
                 onChange={(e) => {
-                  const v = e.target.value; // YYYY-MM
+                  const v = e.target.value; // YYYY-MM or ""
                   if (!v) {
                     setFilters((f) => ({ ...f, dataDe: "", dataAte: "" }));
                     return;
@@ -661,8 +661,23 @@ function Dashboard() {
                   }));
                 }}
                 className="rounded-md border border-border bg-input px-2 py-1.5 text-sm text-foreground"
-              />
+              >
+                <option value="">Todos</option>
+                {opts.meses.map((ym) => {
+                  const [y, m] = ym.split("-");
+                  const nomes = [
+                    "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
+                    "Jul", "Ago", "Set", "Out", "Nov", "Dez",
+                  ];
+                  return (
+                    <option key={ym} value={ym}>
+                      {nomes[Number(m) - 1]}/{y}
+                    </option>
+                  );
+                })}
+              </select>
             </div>
+
             <input
               ref={fileRef}
               type="file"
