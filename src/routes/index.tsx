@@ -301,7 +301,7 @@ function Dashboard() {
     const o = (key: keyof FilterState, getter: (r: Solicitacao) => string | null) =>
       uniq(applyFilters(rows, filters, key).map(getter));
     // Months available (YYYY-MM), respecting Ano filter but not date filters
-    const monthRows = applyFilters(rows, { ...filters, dataDe: "", dataAte: "" }, undefined);
+    const monthRows = applyFilters(rows, { ...filters, dataDe: "", dataAte: "" });
     const meses = Array.from(
       new Set(
         monthRows
