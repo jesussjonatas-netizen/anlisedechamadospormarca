@@ -300,6 +300,15 @@ function Dashboard() {
   const opts = useMemo(() => {
     const o = (key: keyof FilterState, getter: (r: Solicitacao) => string | null) =>
       uniq(applyFilters(rows, filters, key).map(getter));
+    // Months available (YYYY-MM), respecting Ano filter but not date filters
+    const monthRows = applyFilters(rows, { ...filters, dataDe: "", dataAte: "" }, undefined);
+    const meses = Array.from(
+      new Set(
+        monthRows
+          .map((r) => (r.Data ? r.Data.slice(0, 7) : null))
+          .filter((v): v is string => !!v && /^\d{4}-\d{2}$/.test(v)),
+      ),
+    ).sort();
     return {
       ano: uniq(applyFilters(rows, filters, "ano").map((r) => (r.Ano ? String(r.Ano) : null))),
       cd: o("cd", (r) => r.CD),
@@ -311,8 +320,10 @@ function Dashboard() {
       ) as string[],
       cliente: o("cliente", (r) => r.Cliente),
       causa: o("causa", (r) => r["Causa Raiz"]),
+      meses,
     };
   }, [rows, filters]);
+
 
   // KPIs
   const kpi = useMemo(() => {
