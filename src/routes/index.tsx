@@ -510,17 +510,8 @@ function Dashboard() {
     <div className="flex min-h-screen bg-background text-foreground">
       {/* Sidebar */}
       <aside className="flex w-72 flex-shrink-0 flex-col border-r border-border bg-panel">
-        <div className="flex items-center gap-3 border-b border-border px-4 py-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand text-[10px] font-bold uppercase leading-tight text-white">
-            Rede
-            <br />
-            ANCORA
-          </div>
-          <div>
-            <div className="text-sm font-bold">Rede ANCORA</div>
-            <div className="text-[11px] text-muted-foreground">Auditoria HD</div>
-          </div>
-
+        <div className="flex items-center justify-center border-b border-border px-4 py-4">
+          <img src={ancoraLogo} alt="ANCORA" className="h-12 w-auto" />
         </div>
 
         <nav className="border-b border-border p-2">
