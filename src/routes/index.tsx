@@ -391,7 +391,13 @@ function Dashboard() {
 
   // Detalhamento table
   const detalhes = useMemo(() => {
-    const sorted = [...filtered].sort((a, b) => {
+    const q = idSearch.trim().toLowerCase();
+    const base = q
+      ? filtered.filter((r) =>
+          String(r["Id Portal"] ?? "").toLowerCase().includes(q),
+        )
+      : filtered;
+    const sorted = [...base].sort((a, b) => {
       const av = (a as unknown as Record<string, unknown>)[sortKey];
       const bv = (b as unknown as Record<string, unknown>)[sortKey];
       if (av == null && bv == null) return 0;
@@ -404,12 +410,13 @@ function Dashboard() {
         : String(bv).localeCompare(String(av));
     });
     return sorted;
-  }, [filtered, sortKey, sortDir]);
+  }, [filtered, sortKey, sortDir, idSearch]);
 
   const pageSize = 25;
   const totalPages = Math.max(1, Math.ceil(detalhes.length / pageSize));
   const currentPage = Math.min(page, totalPages);
   const pageRows = detalhes.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
 
   const detColumns: { key: keyof Solicitacao; label: string }[] = [
     { key: "Id Portal", label: "Id Portal" },
