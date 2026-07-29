@@ -530,8 +530,8 @@ function Dashboard() {
     <div className="flex min-h-screen bg-background text-foreground">
       {/* Sidebar */}
       <aside className="flex w-72 flex-shrink-0 flex-col border-r border-border bg-panel">
-        <div className="flex items-center justify-center border-b border-border px-4 py-4">
-          <img src={ancoraLogo} alt="ANCORA" className="h-12 w-auto" />
+        <div className="flex items-center justify-center border-b border-border px-4 py-5">
+          <img src={ancoraLogo} alt="ANCORA" className="h-20 w-auto" />
         </div>
 
         <nav className="border-b border-border p-2">
@@ -673,11 +673,6 @@ function Dashboard() {
               <Download className="h-4 w-4" />
               Baixar Excel
             </button>
-            <img
-              src={ancoraLogo}
-              alt="Rede ANCORA"
-              className="ml-4 h-16 w-auto md:h-20"
-            />
           </div>
         </header>
 
