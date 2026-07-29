@@ -673,11 +673,6 @@ function Dashboard() {
               <Download className="h-4 w-4" />
               Baixar Excel
             </button>
-            <img
-              src={ancoraLogo}
-              alt="Rede ANCORA"
-              className="ml-4 h-16 w-auto md:h-20"
-            />
           </div>
         </header>
 
