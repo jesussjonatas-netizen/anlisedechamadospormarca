@@ -886,7 +886,37 @@ function Dashboard() {
           {/* Detalhamento */}
           <section className="rounded-lg bg-panel">
             <SectionHeader>Detalhamento de Chamados</SectionHeader>
+            <div className="flex flex-wrap items-center gap-2 border-b border-border bg-panel/60 px-4 py-3">
+              <label
+                htmlFor="idPortalSearch"
+                className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground"
+              >
+                Buscar Id Portal
+              </label>
+              <input
+                id="idPortalSearch"
+                type="search"
+                inputMode="numeric"
+                value={idSearch}
+                onChange={(e) => {
+                  setIdSearch(e.target.value);
+                  setPage(1);
+                }}
+                placeholder="Digite o Id Portal..."
+                className="w-56 rounded-md border border-border bg-input px-2 py-1.5 text-xs text-foreground focus:border-brand focus:outline-none"
+              />
+              {idSearch && (
+                <button
+                  type="button"
+                  onClick={() => setIdSearch("")}
+                  className="rounded-md border border-border bg-secondary px-2 py-1 text-[11px] text-foreground hover:bg-panel-header"
+                >
+                  Limpar
+                </button>
+              )}
+            </div>
             <div className="overflow-auto">
+
               <table className="w-full text-xs" style={{ tableLayout: "fixed" }}>
                 <colgroup>
                   {detColumns.map((c) => (
