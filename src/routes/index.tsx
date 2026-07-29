@@ -627,7 +627,6 @@ function Dashboard() {
         {/* Header */}
         <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-panel px-6 py-4">
           <div className="flex items-center gap-4">
-            <img src={ancoraLogo} alt="Rede ANCORA" className="h-12 w-auto" />
             <h1 className="text-xl font-bold tracking-wide text-white">
               AUDITORIA DE DEVOLUÇÕES
             </h1>
@@ -646,44 +645,6 @@ function Dashboard() {
                     {a}
                   </option>
                 ))}
-              </select>
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="text-[11px] font-semibold uppercase text-muted-foreground">Mês</span>
-              <select
-                value={
-                  filters.dataDe && filters.dataDe.length >= 7 ? filters.dataDe.slice(0, 7) : ""
-                }
-                onChange={(e) => {
-                  const v = e.target.value; // YYYY-MM or ""
-                  if (!v) {
-                    setFilters((f) => ({ ...f, dataDe: "", dataAte: "" }));
-                    return;
-                  }
-                  const [y, m] = v.split("-").map(Number);
-                  const last = new Date(y, m, 0).getDate();
-                  const mm = String(m).padStart(2, "0");
-                  setFilters((f) => ({
-                    ...f,
-                    dataDe: `${y}-${mm}-01`,
-                    dataAte: `${y}-${mm}-${String(last).padStart(2, "0")}`,
-                  }));
-                }}
-                className="rounded-md border border-border bg-input px-2 py-1.5 text-sm text-foreground"
-              >
-                <option value="">Todos</option>
-                {opts.meses.map((ym) => {
-                  const [y, m] = ym.split("-");
-                  const nomes = [
-                    "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
-                    "Jul", "Ago", "Set", "Out", "Nov", "Dez",
-                  ];
-                  return (
-                    <option key={ym} value={ym}>
-                      {nomes[Number(m) - 1]}/{y}
-                    </option>
-                  );
-                })}
               </select>
             </div>
 
@@ -712,8 +673,14 @@ function Dashboard() {
               <Download className="h-4 w-4" />
               Baixar Excel
             </button>
+            <img
+              src={ancoraLogo}
+              alt="Rede ANCORA"
+              className="ml-4 h-16 w-auto md:h-20"
+            />
           </div>
         </header>
+
 
         <div className="flex-1 space-y-6 overflow-auto p-6">
           {/* KPIs */}
