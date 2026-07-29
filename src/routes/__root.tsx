@@ -77,14 +77,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "Auditoria de Devoluções | Rede ANCORA" },
+      { name: "description", content: "Dashboard interno de auditoria de devoluções da Rede ANCORA com KPIs, filtros e detalhamento de chamados." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "Auditoria de Devoluções | Rede ANCORA" },
+      { property: "og:description", content: "Dashboard interno de auditoria de devoluções da Rede ANCORA com KPIs, filtros e detalhamento de chamados." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Auditoria de Devoluções | Rede ANCORA" },
+      { name: "twitter:description", content: "Dashboard interno de auditoria de devoluções da Rede ANCORA com KPIs, filtros e detalhamento de chamados." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/b890950b-0c03-4abd-b3a9-f0a7bf5ec26b/id-preview-aec7c42e--1c4d0fc5-3962-4f60-9649-06253e6f6e5c.lovable.app-1785328566810.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/b890950b-0c03-4abd-b3a9-f0a7bf5ec26b/id-preview-aec7c42e--1c4d0fc5-3962-4f60-9649-06253e6f6e5c.lovable.app-1785328566810.png" },
     ],
     links: [
       {

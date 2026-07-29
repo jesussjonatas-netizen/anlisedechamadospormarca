@@ -77,7 +77,7 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "Auditoria de Devoluções | Rede ANCORA" },
       {
         property: "og:description",
-        content: "Painel de auditoria de devoluções da Rede ANCORA.",
+        content: "Dashboard interno de auditoria de devoluções da Rede ANCORA com KPIs, filtros e detalhamento de chamados.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
