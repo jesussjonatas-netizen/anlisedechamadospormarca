@@ -8,6 +8,14 @@ let state: { rows: Solicitacao[]; lastUpdate: Date } = {
   lastUpdate: new Date(),
 };
 
+// Stable snapshot used during SSR and the first client render (hydration),
+// so the "Última atualização" timestamp does not mismatch between server
+// and client. After hydration, useSyncExternalStore switches to getSnapshot.
+const serverSnapshot = {
+  rows: rawData as unknown as Solicitacao[],
+  lastUpdate: new Date(0),
+};
+
 function emit() {
   listeners.forEach((l) => l());
 }
@@ -26,6 +34,10 @@ function getSnapshot() {
   return state;
 }
 
+function getServerSnapshot() {
+  return serverSnapshot;
+}
+
 export function useAuditoriaData() {
-  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
