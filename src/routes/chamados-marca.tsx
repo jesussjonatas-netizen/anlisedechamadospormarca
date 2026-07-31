@@ -194,12 +194,13 @@ const TABLE_COLS: { key: string; label: string; get: (r: Solicitacao) => string 
 function ChamadosPorMarca() {
   const { data } = useSuspenseQuery(solicitacoesQueryOptions);
 
-  // escopo: chamados de Crossdocking
-  const base = useMemo(
-    () =>
-      data.rows.filter((r) => (r.Modalidade ?? "").toLowerCase().includes("crossdocking")),
-    [data.rows],
-  );
+  // escopo: chamados de Crossdocking (quando a base tiver essa modalidade)
+  const base = useMemo(() => {
+    const cross = data.rows.filter((r) =>
+      (r.Modalidade ?? "").toLowerCase().includes("crossdocking"),
+    );
+    return cross.length > 0 ? cross : data.rows;
+  }, [data.rows]);
 
   const [filters, setFilters] = useState<FilterState>(emptyFilters);
   const [busca, setBusca] = useState("");
