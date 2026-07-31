@@ -108,3 +108,44 @@ export const seedSolicitacoes = createServerFn({ method: "POST" })
 
     return { inserted: inserts.length };
   });
+
+export const seedFromJsonFile = createServerFn({ method: "POST" }).handler(async () => {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { default: rawRows } = await import("@/data/solicitacoes.json");
+
+  const rows = (rawRows as Solicitacao[]).map((r) => ({
+    data: r.Data ? String(r.Data).slice(0, 10) : null,
+    id_portal: r["Id Portal"] != null ? String(r["Id Portal"]) : null,
+    numero_benner: r["Número Benner"] != null ? String(r["Número Benner"]) : null,
+    nfd: r.NFD != null ? String(r.NFD) : null,
+    cliente: r.Cliente,
+    regiao: r["Região"],
+    cd: r.CD,
+    cd_full: r.CD_Full,
+    nf: r.NF != null ? String(r.NF) : null,
+    valor: r.Valor,
+    modalidade: r.Modalidade,
+    tipo: r.Tipo,
+    causa_raiz: r["Causa Raiz"],
+    status: r.Status,
+    entrada_devolucao: r["Entrada Devolução"] != null ? String(r["Entrada Devolução"]) : null,
+    situacao: r["Situação"] != null ? String(r["Situação"]) : null,
+    status_auditoria: r["Status Auditoria"],
+    data_validacao: r["Data de validação"] ? String(r["Data de validação"]).slice(0, 10) : null,
+    validador: r.Validador != null ? String(r.Validador) : null,
+    obs_reprovacao_aprovacao: r["OBS REPROVAÇÃO/APROVAÇÃO:"],
+    ano: r.Ano,
+  }));
+
+  const { error: deleteError } = await supabaseAdmin.from("solicitacoes").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+  if (deleteError) throw deleteError;
+
+  const batchSize = 500;
+  for (let i = 0; i < rows.length; i += batchSize) {
+    const batch = rows.slice(i, i + batchSize);
+    const { error } = await supabaseAdmin.from("solicitacoes").insert(batch);
+    if (error) throw error;
+  }
+
+  return { inserted: rows.length };
+});
