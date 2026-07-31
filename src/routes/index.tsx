@@ -309,7 +309,11 @@ function SectionHeader({ children }: { children: React.ReactNode }) {
 }
 
 function Dashboard() {
-  const { rows, lastUpdate } = useAuditoriaData();
+  const { data } = useSuspenseQuery(solicitacoesQueryOptions);
+  const rows = data.rows;
+  const lastUpdate = new Date(data.lastUpdate);
+  const queryClient = useQueryClient();
+  const seedFn = useServerFn(seedSolicitacoes);
   const [filters, setFilters] = useState<FilterState>(emptyFilters);
   const [sortKey, setSortKey] = useState<string>("Valor");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
