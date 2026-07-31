@@ -379,8 +379,20 @@ function ChamadosPorMarca() {
           <CxKpiCard title="Total de Chamados" value={fmtInt(kpi.totalChamados)} sub="Marca + ID Portal" />
           <CxKpiCard title="Total de Marcas" value={fmtInt(kpi.totalMarcas)} />
           <CxKpiCard title="Total de Itens" value={fmtInt(kpi.totalItens)} sub="1 linha = 1 item" />
-          <CxKpiCard title="Chamados Procedentes" value={fmtInt(kpi.procedentes)} color={GREEN} />
-          <CxKpiCard title="Chamados Improcedentes" value={fmtInt(kpi.improcedentes)} color={RED} />
+          <CxKpiCard
+            title="Chamados Procedentes"
+            value={fmtInt(kpi.procedentes)}
+            color={GREEN}
+            sub="Demais status"
+            icon={<CheckCircle2 className="h-5 w-5" style={{ color: GREEN }} />}
+          />
+          <CxKpiCard
+            title="Chamados Improcedentes"
+            value={fmtInt(kpi.improcedentes)}
+            color={RED}
+            sub="Status de rejeição/encerramento"
+            icon={<XCircle className="h-5 w-5" style={{ color: RED }} />}
+          />
           <CxKpiCard
             title="% Procedência"
             value={fmtPct(kpi.procedentes, kpi.procedentes + kpi.improcedentes)}
