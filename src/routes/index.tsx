@@ -971,13 +971,26 @@ function Dashboard() {
                                   : v == null
                                     ? "-"
                                     : String(v);
+                            const isIdPortal = c.key === "Id Portal";
+                            const idPortalNum = isIdPortal && v != null && v !== "" ? encodeURIComponent(String(v)) : "";
                             return (
                               <td
                                 key={c.key as string}
                                 className={`truncate whitespace-nowrap px-3 py-2 ${c.key === "Valor" ? "text-right font-mono" : ""}`}
                                 title={String(v ?? "")}
                               >
-                                {display}
+                                {isIdPortal && idPortalNum ? (
+                                  <a
+                                    href={`https://app.redeancora.com.br/b2b/api/admin/warranties/${idPortalNum}/edit`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
+                                  >
+                                    {display}
+                                  </a>
+                                ) : (
+                                  display
+                                )}
                               </td>
                             );
                           })}
