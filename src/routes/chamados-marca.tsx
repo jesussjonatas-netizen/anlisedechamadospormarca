@@ -81,15 +81,35 @@ const fmtPct = (n: number, d: number) => (d === 0 ? "0,0%" : `${((n / d) * 100).
 /** Marca do item; base sem marca preenchida cai em "Não informado". */
 const marcaDe = (r: Solicitacao) => (r.Marca && String(r.Marca).trim()) || "Não informado";
 
-/** Procedência vem da classificação da base; quando ausente, deriva do status de auditoria. */
-function procedenciaDe(r: Solicitacao): "Procedente" | "Improcedente" | "Não classificado" {
-  const raw = (r["Procedência"] ?? "").toString().trim().toLowerCase();
-  if (raw.startsWith("improced")) return "Improcedente";
-  if (raw.startsWith("proced")) return "Procedente";
-  const st = (r["Status Auditoria"] ?? "").toString().trim().toLowerCase();
-  if (st === "reprovado") return "Improcedente";
-  if (st === "aprovado" || st === "pago") return "Procedente";
-  return "Não classificado";
+/** Status considerados improcedentes (regra de negócio da Rede ANCORA). */
+const STATUS_IMPROCEDENTES = new Set(
+  [
+    "Discordância Aceita",
+    "Em Discordância",
+    "Improcedente",
+    "Encerrado",
+    "Cancelado",
+    "Discordância Encerrada",
+    "Encerrada com rejeição",
+    "Negado",
+    "Rejeitado",
+  ].map(normalizarStatus),
+);
+
+/** Normaliza texto: minúsculo, sem acentos e sem espaços extras. */
+function normalizarStatus(s: string) {
+  return s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+}
+
+/** Procedência: Improcedente quando o Status está na lista; caso contrário, Procedente. */
+function procedenciaDe(r: Solicitacao): "Procedente" | "Improcedente" {
+  const st = normalizarStatus((r.Status ?? "").toString());
+  return STATUS_IMPROCEDENTES.has(st) ? "Improcedente" : "Procedente";
 }
 
 /** Chave do chamado único: Marca + ID Portal. */
