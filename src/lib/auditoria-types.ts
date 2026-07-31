@@ -20,6 +20,12 @@ export interface Solicitacao {
   Validador: string | number | null;
   "OBS REPROVAÇÃO/APROVAÇÃO:": string | null;
   Ano: number | null;
+  Marca: string | null;
+  Conferente: string | null;
+  CNA: string | null;
+  "Código": string | null;
+  Nome: string | null;
+  "Procedência": string | null;
 }
 
 export const STATUS_LIST = [
