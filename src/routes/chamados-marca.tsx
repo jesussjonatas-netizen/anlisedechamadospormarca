@@ -244,7 +244,7 @@ function ChamadosPorMarca() {
       modalidade: o("modalidade"),
       tipo: o("tipo"),
       status: o("status"),
-      procedencia: o("procedencia", ["Procedente", "Improcedente", "Não classificado"]),
+      procedencia: o("procedencia", ["Procedente", "Improcedente"]),
     };
   }, [base, filters]);
 
