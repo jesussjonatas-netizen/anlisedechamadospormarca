@@ -1056,6 +1056,23 @@ function Dashboard() {
   );
 }
 
+function Footer({ lastUpdate }: { lastUpdate: Date }) {
+  const formatted = useClientDate(lastUpdate);
+  return (
+    <footer className="flex flex-wrap items-center justify-between gap-2 border-t border-border bg-panel px-6 py-3 text-[11px] text-muted-foreground">
+      <span>
+        Fonte: Sistema HD - Rede ANCORA | Dados extraídos do B2B. Valores exibidos sem impostos,
+        podendo apresentar variações.
+      </span>
+      <span className="inline-flex items-center gap-1">
+        <RefreshCw className="h-3 w-3" />
+        Última atualização:{" "}
+        {formatted ?? lastUpdate.toISOString().slice(0, 16).replace("T", " ")}
+      </span>
+    </footer>
+  );
+}
+
 function EmptyState() {
   return (
     <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
