@@ -45,6 +45,12 @@ function dbToSolicitacao(row: Record<string, unknown>): Solicitacao {
     Validador: row.validador != null ? String(row.validador) : null,
     "OBS REPROVAÇÃO/APROVAÇÃO:": row.obs_reprovacao_aprovacao ? String(row.obs_reprovacao_aprovacao) : null,
     Ano: row.ano != null ? Number(row.ano) : null,
+    Marca: row.marca ? String(row.marca) : null,
+    Conferente: row.conferente ? String(row.conferente) : null,
+    CNA: row.cna != null ? String(row.cna) : null,
+    "Código": row.codigo != null ? String(row.codigo) : null,
+    Nome: row.nome ? String(row.nome) : null,
+    "Procedência": row.procedencia ? String(row.procedencia) : null,
   };
 }
 
