@@ -14,7 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      solicitacoes: {
+        Row: {
+          ano: number | null
+          causa_raiz: string | null
+          cd: string | null
+          cd_full: string | null
+          cliente: string | null
+          created_at: string
+          data: string | null
+          data_validacao: string | null
+          entrada_devolucao: string | null
+          id: string
+          id_portal: string | null
+          modalidade: string | null
+          nf: string | null
+          nfd: string | null
+          numero_benner: string | null
+          obs_reprovacao_aprovacao: string | null
+          regiao: string | null
+          situacao: string | null
+          status: string | null
+          status_auditoria: string | null
+          tipo: string | null
+          validador: string | null
+          valor: number | null
+        }
+        Insert: {
+          ano?: number | null
+          causa_raiz?: string | null
+          cd?: string | null
+          cd_full?: string | null
+          cliente?: string | null
+          created_at?: string
+          data?: string | null
+          data_validacao?: string | null
+          entrada_devolucao?: string | null
+          id?: string
+          id_portal?: string | null
+          modalidade?: string | null
+          nf?: string | null
+          nfd?: string | null
+          numero_benner?: string | null
+          obs_reprovacao_aprovacao?: string | null
+          regiao?: string | null
+          situacao?: string | null
+          status?: string | null
+          status_auditoria?: string | null
+          tipo?: string | null
+          validador?: string | null
+          valor?: number | null
+        }
+        Update: {
+          ano?: number | null
+          causa_raiz?: string | null
+          cd?: string | null
+          cd_full?: string | null
+          cliente?: string | null
+          created_at?: string
+          data?: string | null
+          data_validacao?: string | null
+          entrada_devolucao?: string | null
+          id?: string
+          id_portal?: string | null
+          modalidade?: string | null
+          nf?: string | null
+          nfd?: string | null
+          numero_benner?: string | null
+          obs_reprovacao_aprovacao?: string | null
+          regiao?: string | null
+          situacao?: string | null
+          status?: string | null
+          status_auditoria?: string | null
+          tipo?: string | null
+          validador?: string | null
+          valor?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
