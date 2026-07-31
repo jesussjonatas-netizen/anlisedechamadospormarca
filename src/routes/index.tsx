@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState, useRef, useCallback } from "react";
+import { useMemo, useState, useRef, useCallback, useEffect } from "react";
 import * as XLSX from "xlsx";
 import {
   PieChart,
@@ -31,6 +31,14 @@ import {
   type StatusKey,
 } from "@/lib/auditoria-types";
 import ancoraLogo from "@/assets/ancora-logo.png";
+
+function useClientDate(date: Date) {
+  const [formatted, setFormatted] = useState<string | null>(null);
+  useEffect(() => {
+    setFormatted(date.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" }));
+  }, [date]);
+  return formatted;
+}
 
 // hook for Excel-style resizable columns
 function useColWidths(defaults: Record<string, number>) {
@@ -1042,19 +1050,26 @@ function Dashboard() {
         </div>
 
         {/* Footer */}
-        <footer className="flex flex-wrap items-center justify-between gap-2 border-t border-border bg-panel px-6 py-3 text-[11px] text-muted-foreground">
-          <span>
-            Fonte: Sistema HD - Rede ANCORA | Dados extraídos do B2B. Valores exibidos sem impostos,
-            podendo apresentar variações.
-          </span>
-          <span className="inline-flex items-center gap-1">
-            <RefreshCw className="h-3 w-3" />
-            Última atualização:{" "}
-            {lastUpdate.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}
-          </span>
-        </footer>
+        <Footer lastUpdate={lastUpdate} />
       </main>
     </div>
+  );
+}
+
+function Footer({ lastUpdate }: { lastUpdate: Date }) {
+  const formatted = useClientDate(lastUpdate);
+  return (
+    <footer className="flex flex-wrap items-center justify-between gap-2 border-t border-border bg-panel px-6 py-3 text-[11px] text-muted-foreground">
+      <span>
+        Fonte: Sistema HD - Rede ANCORA | Dados extraídos do B2B. Valores exibidos sem impostos,
+        podendo apresentar variações.
+      </span>
+      <span className="inline-flex items-center gap-1">
+        <RefreshCw className="h-3 w-3" />
+        Última atualização:{" "}
+        {formatted ?? lastUpdate.toISOString().slice(0, 16).replace("T", " ")}
+      </span>
+    </footer>
   );
 }
 
