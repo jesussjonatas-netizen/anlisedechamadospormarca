@@ -13,7 +13,7 @@ import {
   Legend,
   CartesianGrid,
 } from "recharts";
-import { ChevronUp, ChevronDown, Eraser, Search } from "lucide-react";
+import { CheckCircle2, ChevronUp, ChevronDown, Eraser, Search, XCircle } from "lucide-react";
 import type { Solicitacao } from "@/lib/auditoria-types";
 import { solicitacoesQueryOptions } from "@/lib/solicitacoes-queries";
 import { CxKpiCard, CxMultiSelect, CxPanel } from "@/components/cx-ui";
