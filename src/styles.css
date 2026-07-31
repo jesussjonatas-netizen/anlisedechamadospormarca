@@ -81,3 +81,18 @@
     font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   }
 }
+
+/* Tema executivo claro — escopado à análise de chamados por marca */
+.cx-theme {
+  --cx-blue: #083b63;
+  --cx-blue-soft: #0f5486;
+  --cx-green: #7ac143;
+  --cx-red: #ce0e2d;
+  --cx-bg: #f2f4f7;
+  --cx-card: #ffffff;
+  --cx-border: #dfe4ea;
+  --cx-text: #1c2733;
+  --cx-muted: #667585;
+  background-color: var(--cx-bg);
+  color: var(--cx-text);
+}
