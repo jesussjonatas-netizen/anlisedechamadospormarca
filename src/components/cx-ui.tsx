@@ -84,25 +84,30 @@ export function CxMultiSelect({
   );
 }
 
-/** Card de KPI branco com borda colorida à esquerda. */
+/** Card de KPI branco com borda colorida à esquerda e ícone opcional. */
 export function CxKpiCard({
   title,
   value,
   sub,
   color,
+  icon,
 }: {
   title: string;
   value: string;
   sub?: string;
   color?: string;
+  icon?: React.ReactNode;
 }) {
   return (
     <div
       className="rounded-lg border border-[var(--cx-border)] border-l-4 bg-[var(--cx-card)] p-4 shadow-sm"
       style={{ borderLeftColor: color || "var(--cx-blue)" }}
     >
-      <div className="text-[11px] font-semibold uppercase tracking-wide text-[var(--cx-muted)]">
-        {title}
+      <div className="flex items-start justify-between gap-2">
+        <div className="text-[11px] font-semibold uppercase tracking-wide text-[var(--cx-muted)]">
+          {title}
+        </div>
+        {icon && <span className="shrink-0">{icon}</span>}
       </div>
       <div className="mt-2 text-2xl font-bold text-[var(--cx-text)]">{value}</div>
       {sub && <div className="mt-1 text-xs text-[var(--cx-muted)]">{sub}</div>}

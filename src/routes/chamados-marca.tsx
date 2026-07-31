@@ -13,7 +13,7 @@ import {
   Legend,
   CartesianGrid,
 } from "recharts";
-import { ChevronUp, ChevronDown, Eraser, Search } from "lucide-react";
+import { CheckCircle2, ChevronUp, ChevronDown, Eraser, Search, XCircle } from "lucide-react";
 import type { Solicitacao } from "@/lib/auditoria-types";
 import { solicitacoesQueryOptions } from "@/lib/solicitacoes-queries";
 import { CxKpiCard, CxMultiSelect, CxPanel } from "@/components/cx-ui";
@@ -81,15 +81,35 @@ const fmtPct = (n: number, d: number) => (d === 0 ? "0,0%" : `${((n / d) * 100).
 /** Marca do item; base sem marca preenchida cai em "Não informado". */
 const marcaDe = (r: Solicitacao) => (r.Marca && String(r.Marca).trim()) || "Não informado";
 
-/** Procedência vem da classificação da base; quando ausente, deriva do status de auditoria. */
-function procedenciaDe(r: Solicitacao): "Procedente" | "Improcedente" | "Não classificado" {
-  const raw = (r["Procedência"] ?? "").toString().trim().toLowerCase();
-  if (raw.startsWith("improced")) return "Improcedente";
-  if (raw.startsWith("proced")) return "Procedente";
-  const st = (r["Status Auditoria"] ?? "").toString().trim().toLowerCase();
-  if (st === "reprovado") return "Improcedente";
-  if (st === "aprovado" || st === "pago") return "Procedente";
-  return "Não classificado";
+/** Status considerados improcedentes (regra de negócio da Rede ANCORA). */
+const STATUS_IMPROCEDENTES = new Set(
+  [
+    "Discordância Aceita",
+    "Em Discordância",
+    "Improcedente",
+    "Encerrado",
+    "Cancelado",
+    "Discordância Encerrada",
+    "Encerrada com rejeição",
+    "Negado",
+    "Rejeitado",
+  ].map(normalizarStatus),
+);
+
+/** Normaliza texto: minúsculo, sem acentos e sem espaços extras. */
+function normalizarStatus(s: string) {
+  return s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+}
+
+/** Procedência: Improcedente quando o Status está na lista; caso contrário, Procedente. */
+function procedenciaDe(r: Solicitacao): "Procedente" | "Improcedente" {
+  const st = normalizarStatus((r.Status ?? "").toString());
+  return STATUS_IMPROCEDENTES.has(st) ? "Improcedente" : "Procedente";
 }
 
 /** Chave do chamado único: Marca + ID Portal. */
@@ -224,7 +244,7 @@ function ChamadosPorMarca() {
       modalidade: o("modalidade"),
       tipo: o("tipo"),
       status: o("status"),
-      procedencia: o("procedencia", ["Procedente", "Improcedente", "Não classificado"]),
+      procedencia: o("procedencia", ["Procedente", "Improcedente"]),
     };
   }, [base, filters]);
 
@@ -260,7 +280,7 @@ function ChamadosPorMarca() {
     for (const r of filtered) {
       const m = marcaDe(r);
       const p = procedenciaDe(r);
-      if (p === "Não classificado") continue;
+      
       if (!map.has(m)) map.set(m, { proc: new Set(), improc: new Set() });
       const e = map.get(m)!;
       (p === "Procedente" ? e.proc : e.improc).add(String(r["Id Portal"] ?? "-"));
@@ -359,8 +379,20 @@ function ChamadosPorMarca() {
           <CxKpiCard title="Total de Chamados" value={fmtInt(kpi.totalChamados)} sub="Marca + ID Portal" />
           <CxKpiCard title="Total de Marcas" value={fmtInt(kpi.totalMarcas)} />
           <CxKpiCard title="Total de Itens" value={fmtInt(kpi.totalItens)} sub="1 linha = 1 item" />
-          <CxKpiCard title="Chamados Procedentes" value={fmtInt(kpi.procedentes)} color={GREEN} />
-          <CxKpiCard title="Chamados Improcedentes" value={fmtInt(kpi.improcedentes)} color={RED} />
+          <CxKpiCard
+            title="Chamados Procedentes"
+            value={fmtInt(kpi.procedentes)}
+            color={GREEN}
+            sub="Demais status"
+            icon={<CheckCircle2 className="h-5 w-5" style={{ color: GREEN }} />}
+          />
+          <CxKpiCard
+            title="Chamados Improcedentes"
+            value={fmtInt(kpi.improcedentes)}
+            color={RED}
+            sub="Status de rejeição/encerramento"
+            icon={<XCircle className="h-5 w-5" style={{ color: RED }} />}
+          />
           <CxKpiCard
             title="% Procedência"
             value={fmtPct(kpi.procedentes, kpi.procedentes + kpi.improcedentes)}
