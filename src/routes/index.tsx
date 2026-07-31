@@ -94,6 +94,20 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(solicitacoesQueryOptions),
+  errorComponent: ({ error }) => (
+    <div className="flex min-h-screen items-center justify-center bg-background px-4" role="alert">
+      <div className="max-w-md text-center text-destructive">
+        <h1 className="text-xl font-semibold">Erro ao carregar dados</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
+      </div>
+    </div>
+  ),
+  notFoundComponent: () => (
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="text-center text-muted-foreground">Nenhum dado encontrado.</div>
+    </div>
+  ),
   component: Dashboard,
 });
 
