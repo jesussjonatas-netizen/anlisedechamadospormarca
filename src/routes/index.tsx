@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState, useRef, useCallback, useEffect } from "react";
+import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import * as XLSX from "xlsx";
 import {
   PieChart,
@@ -23,13 +24,15 @@ import {
   ChevronDown,
   Check,
 } from "lucide-react";
-import { useAuditoriaData, setRows } from "@/lib/auditoria-store";
 import {
   STATUS_LIST,
   STATUS_COLORS,
   type Solicitacao,
   type StatusKey,
 } from "@/lib/auditoria-types";
+import { solicitacoesQueryOptions } from "@/lib/solicitacoes-queries";
+import { seedSolicitacoes } from "@/lib/solicitacoes.functions";
+import { useServerFn } from "@tanstack/react-start";
 import ancoraLogo from "@/assets/ancora-logo.png";
 
 function useClientDate(date: Date) {
