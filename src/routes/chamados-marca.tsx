@@ -280,7 +280,7 @@ function ChamadosPorMarca() {
     for (const r of filtered) {
       const m = marcaDe(r);
       const p = procedenciaDe(r);
-      if (p === "Não classificado") continue;
+      
       if (!map.has(m)) map.set(m, { proc: new Set(), improc: new Set() });
       const e = map.get(m)!;
       (p === "Procedente" ? e.proc : e.improc).add(String(r["Id Portal"] ?? "-"));
