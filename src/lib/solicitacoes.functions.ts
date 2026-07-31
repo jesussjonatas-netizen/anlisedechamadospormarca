@@ -62,11 +62,24 @@ export const getSolicitacoes = createServerFn({ method: "GET" }).handler(async (
     },
   );
 
-  const { data, error } = await supabasePublic.from("solicitacoes").select("*");
-  if (error) throw error;
+  const allRows: Record<string, unknown>[] = [];
+  const pageSize = 1000;
+  let start = 0;
+  while (true) {
+    const { data, error } = await supabasePublic
+      .from("solicitacoes")
+      .select("*")
+      .range(start, start + pageSize - 1)
+      .order("id", { ascending: true });
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+    allRows.push(...data);
+    if (data.length < pageSize) break;
+    start += pageSize;
+  }
 
   return {
-    rows: (data || []).map(dbToSolicitacao),
+    rows: allRows.map(dbToSolicitacao),
     lastUpdate: new Date().toISOString(),
   };
 });
