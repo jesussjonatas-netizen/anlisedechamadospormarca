@@ -76,6 +76,9 @@ export const seedSolicitacoes = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
+    const { error: deleteError } = await supabaseAdmin.from("solicitacoes").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+    if (deleteError) throw deleteError;
+
     const inserts = data.rows.map((r) => ({
       data: r.Data ? String(r.Data).slice(0, 10) : null,
       id_portal: r["Id Portal"] != null ? String(r["Id Portal"]) : null,
