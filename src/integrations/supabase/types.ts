@@ -21,17 +21,23 @@ export type Database = {
           cd: string | null
           cd_full: string | null
           cliente: string | null
+          cna: string | null
+          codigo: string | null
+          conferente: string | null
           created_at: string
           data: string | null
           data_validacao: string | null
           entrada_devolucao: string | null
           id: string
           id_portal: string | null
+          marca: string | null
           modalidade: string | null
           nf: string | null
           nfd: string | null
+          nome: string | null
           numero_benner: string | null
           obs_reprovacao_aprovacao: string | null
+          procedencia: string | null
           regiao: string | null
           situacao: string | null
           status: string | null
@@ -46,17 +52,23 @@ export type Database = {
           cd?: string | null
           cd_full?: string | null
           cliente?: string | null
+          cna?: string | null
+          codigo?: string | null
+          conferente?: string | null
           created_at?: string
           data?: string | null
           data_validacao?: string | null
           entrada_devolucao?: string | null
           id?: string
           id_portal?: string | null
+          marca?: string | null
           modalidade?: string | null
           nf?: string | null
           nfd?: string | null
+          nome?: string | null
           numero_benner?: string | null
           obs_reprovacao_aprovacao?: string | null
+          procedencia?: string | null
           regiao?: string | null
           situacao?: string | null
           status?: string | null
@@ -71,17 +83,23 @@ export type Database = {
           cd?: string | null
           cd_full?: string | null
           cliente?: string | null
+          cna?: string | null
+          codigo?: string | null
+          conferente?: string | null
           created_at?: string
           data?: string | null
           data_validacao?: string | null
           entrada_devolucao?: string | null
           id?: string
           id_portal?: string | null
+          marca?: string | null
           modalidade?: string | null
           nf?: string | null
           nfd?: string | null
+          nome?: string | null
           numero_benner?: string | null
           obs_reprovacao_aprovacao?: string | null
+          procedencia?: string | null
           regiao?: string | null
           situacao?: string | null
           status?: string | null

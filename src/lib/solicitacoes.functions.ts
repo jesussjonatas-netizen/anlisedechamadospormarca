@@ -45,6 +45,12 @@ function dbToSolicitacao(row: Record<string, unknown>): Solicitacao {
     Validador: row.validador != null ? String(row.validador) : null,
     "OBS REPROVAÇÃO/APROVAÇÃO:": row.obs_reprovacao_aprovacao ? String(row.obs_reprovacao_aprovacao) : null,
     Ano: row.ano != null ? Number(row.ano) : null,
+    Marca: row.marca ? String(row.marca) : null,
+    Conferente: row.conferente ? String(row.conferente) : null,
+    CNA: row.cna != null ? String(row.cna) : null,
+    "Código": row.codigo != null ? String(row.codigo) : null,
+    Nome: row.nome ? String(row.nome) : null,
+    "Procedência": row.procedencia ? String(row.procedencia) : null,
   };
 }
 
@@ -114,6 +120,12 @@ export const seedSolicitacoes = createServerFn({ method: "POST" })
       validador: r.Validador != null ? String(r.Validador) : null,
       obs_reprovacao_aprovacao: r["OBS REPROVAÇÃO/APROVAÇÃO:"],
       ano: r.Ano,
+      marca: r.Marca ?? null,
+      conferente: r.Conferente ?? null,
+      cna: r.CNA != null ? String(r.CNA) : null,
+      codigo: r["Código"] != null ? String(r["Código"]) : null,
+      nome: r.Nome ?? null,
+      procedencia: r["Procedência"] ?? null,
     }));
 
     const { error } = await supabaseAdmin.from("solicitacoes").insert(inserts);
@@ -148,6 +160,12 @@ export const seedFromJsonFile = createServerFn({ method: "POST" }).handler(async
     validador: r.Validador != null ? String(r.Validador) : null,
     obs_reprovacao_aprovacao: r["OBS REPROVAÇÃO/APROVAÇÃO:"],
     ano: r.Ano,
+    marca: r.Marca ?? null,
+    conferente: r.Conferente ?? null,
+    cna: r.CNA != null ? String(r.CNA) : null,
+    codigo: r["Código"] != null ? String(r["Código"]) : null,
+    nome: r.Nome ?? null,
+    procedencia: r["Procedência"] ?? null,
   }));
 
   const { error: deleteError } = await supabaseAdmin.from("solicitacoes").delete().neq("id", "00000000-0000-0000-0000-000000000000");
