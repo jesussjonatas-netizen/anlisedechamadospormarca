@@ -32,6 +32,14 @@ import {
 } from "@/lib/auditoria-types";
 import ancoraLogo from "@/assets/ancora-logo.png";
 
+function useClientDate(date: Date) {
+  const [formatted, setFormatted] = useState<string | null>(null);
+  useEffect(() => {
+    setFormatted(date.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" }));
+  }, [date]);
+  return formatted;
+}
+
 // hook for Excel-style resizable columns
 function useColWidths(defaults: Record<string, number>) {
   const [widths, setWidths] = useState<Record<string, number>>(defaults);
