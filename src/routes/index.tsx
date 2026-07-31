@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState, useRef, useCallback, useEffect } from "react";
+import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import * as XLSX from "xlsx";
 import {
   PieChart,
@@ -23,13 +24,15 @@ import {
   ChevronDown,
   Check,
 } from "lucide-react";
-import { useAuditoriaData, setRows } from "@/lib/auditoria-store";
 import {
   STATUS_LIST,
   STATUS_COLORS,
   type Solicitacao,
   type StatusKey,
 } from "@/lib/auditoria-types";
+import { solicitacoesQueryOptions } from "@/lib/solicitacoes-queries";
+import { seedSolicitacoes } from "@/lib/solicitacoes.functions";
+import { useServerFn } from "@tanstack/react-start";
 import ancoraLogo from "@/assets/ancora-logo.png";
 
 function useClientDate(date: Date) {
@@ -91,6 +94,20 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(solicitacoesQueryOptions),
+  errorComponent: ({ error }) => (
+    <div className="flex min-h-screen items-center justify-center bg-background px-4" role="alert">
+      <div className="max-w-md text-center text-destructive">
+        <h1 className="text-xl font-semibold">Erro ao carregar dados</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
+      </div>
+    </div>
+  ),
+  notFoundComponent: () => (
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="text-center text-muted-foreground">Nenhum dado encontrado.</div>
+    </div>
+  ),
   component: Dashboard,
 });
 
@@ -292,7 +309,11 @@ function SectionHeader({ children }: { children: React.ReactNode }) {
 }
 
 function Dashboard() {
-  const { rows, lastUpdate } = useAuditoriaData();
+  const { data } = useSuspenseQuery(solicitacoesQueryOptions);
+  const rows = data.rows;
+  const lastUpdate = new Date(data.lastUpdate);
+  const queryClient = useQueryClient();
+  const seedFn = useServerFn(seedSolicitacoes);
   const [filters, setFilters] = useState<FilterState>(emptyFilters);
   const [sortKey, setSortKey] = useState<string>("Valor");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
@@ -530,7 +551,8 @@ function Dashboard() {
         } as Solicitacao;
       })
       .filter((x): x is Solicitacao => x !== null);
-    setRows(parsed);
+    await seedFn({ data: { rows: parsed } });
+    await queryClient.invalidateQueries({ queryKey: ["solicitacoes"] });
     setFilters(emptyFilters);
   };
 
