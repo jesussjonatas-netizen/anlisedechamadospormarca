@@ -1050,17 +1050,7 @@ function Dashboard() {
         </div>
 
         {/* Footer */}
-        <footer className="flex flex-wrap items-center justify-between gap-2 border-t border-border bg-panel px-6 py-3 text-[11px] text-muted-foreground">
-          <span>
-            Fonte: Sistema HD - Rede ANCORA | Dados extraídos do B2B. Valores exibidos sem impostos,
-            podendo apresentar variações.
-          </span>
-          <span className="inline-flex items-center gap-1">
-            <RefreshCw className="h-3 w-3" />
-            Última atualização:{" "}
-            {lastUpdate.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}
-          </span>
-        </footer>
+        <Footer lastUpdate={lastUpdate} />
       </main>
     </div>
   );
