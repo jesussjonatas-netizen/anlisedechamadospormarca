@@ -551,7 +551,8 @@ function Dashboard() {
         } as Solicitacao;
       })
       .filter((x): x is Solicitacao => x !== null);
-    setRows(parsed);
+    await seedFn({ data: { rows: parsed } });
+    await queryClient.invalidateQueries({ queryKey: ["solicitacoes"] });
     setFilters(emptyFilters);
   };
 
