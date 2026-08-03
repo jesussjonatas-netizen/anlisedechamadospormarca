@@ -94,6 +94,12 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
+  ssr: false,
+  beforeLoad: async () => {
+    const { supabase } = await import("@/integrations/supabase/client");
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) throw redirect({ to: "/auth" });
+  },
   loader: ({ context }) => context.queryClient.ensureQueryData(solicitacoesQueryOptions),
   errorComponent: ({ error }) => (
     <div className="flex min-h-screen items-center justify-center bg-background px-4" role="alert">
