@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {
@@ -50,11 +50,7 @@ export const Route = createFileRoute("/chamados-marca")({
     ],
   }),
   ssr: false,
-  beforeLoad: async () => {
-    const { supabase } = await import("@/integrations/supabase/client");
-    const { data } = await supabase.auth.getUser();
-    if (!data.user) throw redirect({ to: "/auth" });
-  },
+
   loader: ({ context }) => context.queryClient.ensureQueryData(solicitacoesQueryOptions),
   errorComponent: ({ error }) => (
     <div className="flex min-h-screen items-center justify-center px-4" role="alert">

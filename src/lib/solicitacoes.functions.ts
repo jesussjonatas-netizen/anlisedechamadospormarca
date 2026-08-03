@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Solicitacao } from "./auditoria-types";
 
 function isNewSupabaseApiKey(value: string): boolean {
@@ -55,14 +54,17 @@ function dbToSolicitacao(row: Record<string, unknown>): Solicitacao {
   };
 }
 
-export const getSolicitacoes = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+export const getSolicitacoes = createServerFn({ method: "GET" }).handler(async () => {
+  const supabaseKey = process.env['SUPABASE_PUBLISHABLE_KEY']!;
+  const supabase = createClient(process.env['SUPABASE_URL']!, supabaseKey, {
+    auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+    global: { fetch: createSupabaseFetch(supabaseKey) },
+  });
   const allRows: Record<string, unknown>[] = [];
   const pageSize = 1000;
   let start = 0;
   while (true) {
-    const { data, error } = await context.supabase
+    const { data, error } = await supabase
       .from("solicitacoes")
       .select("*")
       .range(start, start + pageSize - 1)

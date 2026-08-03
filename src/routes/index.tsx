@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState, useRef, useCallback, useEffect } from "react";
 import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import * as XLSX from "xlsx";
@@ -95,11 +95,7 @@ export const Route = createFileRoute("/")({
     ],
   }),
   ssr: false,
-  beforeLoad: async () => {
-    const { supabase } = await import("@/integrations/supabase/client");
-    const { data } = await supabase.auth.getUser();
-    if (!data.user) throw redirect({ to: "/auth" });
-  },
+
   loader: ({ context }) => context.queryClient.ensureQueryData(solicitacoesQueryOptions),
   errorComponent: ({ error }) => (
     <div className="flex min-h-screen items-center justify-center bg-background px-4" role="alert">
