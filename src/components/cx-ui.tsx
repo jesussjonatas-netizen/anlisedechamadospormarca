@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, ChevronDown } from "lucide-react";
+import { Check, ChevronDown, Search as SearchIcon } from "lucide-react";
 
 /** Select múltiplo reutilizável no tema executivo claro. */
 export function CxMultiSelect({
