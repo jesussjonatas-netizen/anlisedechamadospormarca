@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {
@@ -49,6 +49,12 @@ export const Route = createFileRoute("/chamados-marca")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
+  ssr: false,
+  beforeLoad: async () => {
+    const { supabase } = await import("@/integrations/supabase/client");
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) throw redirect({ to: "/auth" });
+  },
   loader: ({ context }) => context.queryClient.ensureQueryData(solicitacoesQueryOptions),
   errorComponent: ({ error }) => (
     <div className="flex min-h-screen items-center justify-center px-4" role="alert">
@@ -239,7 +245,7 @@ function ChamadosPorMarca() {
 
   // escopo: chamados de Crossdocking (quando a base tiver essa modalidade)
   const base = useMemo(() => {
-    const cross = data.rows.filter((r) => norm(r.Modalidade).includes("crossdocking"));
+    const cross = data.rows.filter((r: Solicitacao) => norm(r.Modalidade).includes("crossdocking"));
     return cross.length > 0 ? cross : data.rows;
   }, [data.rows]);
 

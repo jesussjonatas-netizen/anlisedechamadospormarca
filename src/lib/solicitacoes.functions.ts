@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Solicitacao } from "./auditoria-types";
 
 function isNewSupabaseApiKey(value: string): boolean {
@@ -54,32 +55,21 @@ function dbToSolicitacao(row: Record<string, unknown>): Solicitacao {
   };
 }
 
-export const getSolicitacoes = createServerFn({ method: "GET" }).handler(async () => {
-  const supabasePublic = createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_PUBLISHABLE_KEY!,
-    {
-      global: { fetch: createSupabaseFetch(process.env.SUPABASE_PUBLISHABLE_KEY!) },
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-        storage: undefined,
-      },
-    },
-  );
-
+export const getSolicitacoes = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
   const allRows: Record<string, unknown>[] = [];
   const pageSize = 1000;
   let start = 0;
   while (true) {
-    const { data, error } = await supabasePublic
+    const { data, error } = await context.supabase
       .from("solicitacoes")
       .select("*")
       .range(start, start + pageSize - 1)
       .order("id", { ascending: true });
     if (error) throw error;
     if (!data || data.length === 0) break;
-    allRows.push(...data);
+    allRows.push(...(data as Record<string, unknown>[]));
     if (data.length < pageSize) break;
     start += pageSize;
   }
