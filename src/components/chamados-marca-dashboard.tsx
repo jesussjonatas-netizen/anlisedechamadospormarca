@@ -612,118 +612,32 @@ export default function ChamadosPorMarca() {
             </div>
           </CxPanel>
 
-          {/* Tabela */}
-          <CxPanel title="Detalhamento dos Itens">
-            <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-              <div className="relative w-full max-w-sm">
-                <Search className="pointer-events-none absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--cx-muted)]" />
-                <input
-                  value={busca}
-                  onChange={(e) => {
-                    setBusca(e.target.value);
-                    setPage(1);
-                  }}
-                  placeholder="Pesquisar em todas as colunas..."
-                  className="w-full rounded-md border border-[var(--cx-border)] py-2 pl-8 pr-3 text-sm outline-none focus:border-[var(--cx-blue)]"
-                />
-              </div>
-              <div className="text-xs text-[var(--cx-muted)]">
-                {fmtInt(tableRows.length)} itens • {fmtInt(contarChamados(tableRows))} chamados únicos
-              </div>
-            </div>
-
-            <div className="overflow-x-auto rounded-md border border-[var(--cx-border)]">
-              <table className="w-full min-w-[1200px] text-sm">
-                <thead>
-                  <tr className="bg-[var(--cx-bg)] text-left">
-                    {TABLE_COLS.map((c) => (
-                      <th key={c.key} className="whitespace-nowrap px-3 py-2 font-semibold">
-                        <button
-                          type="button"
-                          onClick={() => toggleSort(c.key)}
-                          className="inline-flex items-center gap-1 hover:text-[var(--cx-blue)]"
-                        >
-                          {c.label}
-                          {sortKey === c.key &&
-                            (sortDir === "asc" ? (
-                              <ChevronUp className="h-3 w-3" />
-                            ) : (
-                              <ChevronDown className="h-3 w-3" />
-                            ))}
-                        </button>
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {pageRows.length === 0 && (
-                    <tr>
-                      <td colSpan={TABLE_COLS.length} className="px-3 py-6 text-center text-[var(--cx-muted)]">
-                        Nenhum registro encontrado.
-                      </td>
-                    </tr>
-                  )}
-                  {pageRows.map((r, i) => (
-                    <tr
-                      key={`${chamadoKey(r)}-${i}`}
-                      className="border-t border-[var(--cx-border)] hover:bg-[var(--cx-bg)]"
-                    >
-                      {TABLE_COLS.map((c) => {
-                        const v = c.get(r);
-                        let text: string;
-                        if (v == null || v === "") text = "-";
-                        else if (c.key === "Valor") text = fmtBRL(Number(v));
-                        else if (c.key === "Data") text = String(v).slice(0, 10).split("-").reverse().join("/");
-                        else text = String(v);
-                        const cor =
-                          c.key === "Classificação"
-                            ? text === "Improcedente"
-                              ? RED
-                              : text === "Procedente"
-                                ? GREEN
-                                : BLUE
-                            : undefined;
-                        return (
-                          <td
-                            key={c.key}
-                            className="max-w-[240px] truncate whitespace-nowrap px-3 py-2"
-                            title={text}
-                            style={cor ? { color: cor, fontWeight: 600 } : undefined}
-                          >
-                            {text}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-sm">
-              <span className="text-[var(--cx-muted)]">
-                Página {currentPage} de {totalPages}
-              </span>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  className="rounded-md border border-[var(--cx-border)] px-3 py-1.5 disabled:opacity-40"
-                >
-                  Anterior
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
-                  className="rounded-md border border-[var(--cx-border)] px-3 py-1.5 disabled:opacity-40"
-                >
-                  Próxima
-                </button>
-              </div>
+          {/* Ranking de Clientes */}
+          <CxPanel
+            title="Ranking de Clientes"
+            actions={<CxSearch value={buscaCliente} onChange={setBuscaCliente} placeholder="Buscar cliente..." />}
+          >
+            <div style={{ height: Math.max(280, rankingClientes.length * 30) }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={rankingClientes} layout="vertical" margin={{ left: 16, right: 40 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e6eaef" horizontal={false} />
+                  <XAxis type="number" tick={{ fontSize: 11 }} />
+                  <YAxis type="category" dataKey="cliente" width={200} tick={{ fontSize: 10 }} />
+                  <Tooltip formatter={(v: number) => [fmtInt(v), "Chamados"]} />
+                  <Bar
+                    dataKey="chamados"
+                    fill={BLUE}
+                    radius={[0, 4, 4, 0]}
+                    cursor="pointer"
+                    onClick={(d: { cliente?: string }) => d?.cliente && toggleValue("cliente", d.cliente)}
+                  >
+                    <LabelList dataKey="chamados" position="right" style={{ fontSize: 10, fill: BLUE }} />
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </CxPanel>
+
         </main>
       </div>
 
