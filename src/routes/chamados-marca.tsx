@@ -239,7 +239,7 @@ function ChamadosPorMarca() {
 
   // escopo: chamados de Crossdocking (quando a base tiver essa modalidade)
   const base = useMemo(() => {
-    const cross = data.rows.filter((r) => norm(r.Modalidade).includes("crossdocking"));
+    const cross = data.rows.filter((r: Solicitacao) => norm(r.Modalidade).includes("crossdocking"));
     return cross.length > 0 ? cross : data.rows;
   }, [data.rows]);
 
