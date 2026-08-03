@@ -41,7 +41,8 @@
 
 :root {
   --radius: 0.5rem;
-  --background: #ffffff --foreground: #f5f7fb;
+  --background: #0d1b3e;
+  --foreground: #f5f7fb;
   --panel: #12234f;
   --panel-header: #16295c;
   --card: #12234f;
@@ -77,15 +78,7 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family:
-      ui-sans-serif,
-      system-ui,
-      -apple-system,
-      "Segoe UI",
-      Roboto,
-      "Helvetica Neue",
-      Arial,
-      sans-serif;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   }
 }
 
