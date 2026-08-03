@@ -337,62 +337,41 @@ export default function ChamadosPorMarca() {
   }, [filtered, granularidade]);
 
   // ---- Tabela ----
-  const tableRows = useMemo(() => {
-    const q = norm(busca);
-    const rows = q
-      ? filtered.filter((r) => TABLE_COLS.some((c) => norm(c.get(r)).includes(q)))
-      : filtered;
-    const col = TABLE_COLS.find((c) => c.key === sortKey) ?? TABLE_COLS[0];
-    return [...rows].sort((a, b) => {
-      const av = col.get(a);
-      const bv = col.get(b);
-      if (av == null && bv == null) return 0;
-      if (av == null) return 1;
-      if (bv == null) return -1;
-      if (typeof av === "number" && typeof bv === "number")
-        return sortDir === "asc" ? av - bv : bv - av;
-      return sortDir === "asc"
-        ? String(av).localeCompare(String(bv), "pt-BR", { numeric: true })
-        : String(bv).localeCompare(String(av), "pt-BR", { numeric: true });
-    });
-  }, [filtered, busca, sortKey, sortDir]);
-
-  const pageSize = 25;
-  const totalPages = Math.max(1, Math.ceil(tableRows.length / pageSize));
-  const currentPage = Math.min(page, totalPages);
-  const pageRows = tableRows.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  // ---- Ranking de clientes (chamados únicos) ----
+  const rankingClientes = useMemo(() => {
+    const map = new Map<string, Set<string>>();
+    for (const r of filtered) {
+      const cli = (r.Cliente && String(r.Cliente).trim()) || "Não informado";
+      if (!map.has(cli)) map.set(cli, new Set());
+      map.get(cli)!.add(chamadoKey(r));
+    }
+    const q = norm(buscaCliente);
+    return Array.from(map.entries())
+      .map(([cliente, ids]) => ({ cliente, chamados: ids.size }))
+      .filter((d) => (q ? norm(d.cliente).includes(q) : true))
+      .sort((a, b) => b.chamados - a.chamados)
+      .slice(0, 15);
+  }, [filtered, buscaCliente]);
 
   const setFilter = (k: FilterKey) => (v: string[]) => {
     setFilters((f) => ({ ...f, [k]: v }));
-    setPage(1);
   };
 
   const toggleValue = (k: FilterKey, v: string) => {
     setFilters((f) => ({ ...f, [k]: f[k].includes(v) ? f[k].filter((x) => x !== v) : [...f[k], v] }));
-    setPage(1);
-  };
-
-  const toggleSort = (key: string) => {
-    if (key === sortKey) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    else {
-      setSortKey(key);
-      setSortDir("asc");
-    }
-    setPage(1);
   };
 
   const limpar = () => {
     setFilters(emptyFilters);
-    setBusca("");
     setBuscaMarca("");
     setBuscaProc("");
     setBuscaItem("");
-    setPage(1);
+    setBuscaCliente("");
   };
 
   const exportar = async () => {
     const XLSX = await import("xlsx");
-    const dados = tableRows.map((r) =>
+    const dados = filtered.map((r) =>
       Object.fromEntries(TABLE_COLS.map((c) => [c.label, c.get(r) ?? ""])),
     );
     const ws = XLSX.utils.json_to_sheet(dados);
@@ -400,6 +379,7 @@ export default function ChamadosPorMarca() {
     XLSX.utils.book_append_sheet(wb, ws, "Chamados");
     XLSX.writeFile(wb, "chamados-por-marca.xlsx");
   };
+
 
   const ultimaAtualizacao = new Date(data.lastUpdate).toLocaleString("pt-BR", {
     timeZone: "America/Sao_Paulo",
