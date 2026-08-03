@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Solicitacao } from "./auditoria-types";
 
 function isNewSupabaseApiKey(value: string): boolean {
