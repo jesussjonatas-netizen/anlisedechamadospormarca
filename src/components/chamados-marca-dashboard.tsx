@@ -198,7 +198,7 @@ const TABLE_COLS: { key: string; label: string; get: (r: Solicitacao) => string 
   { key: "Causa Raiz", label: "Causa Raiz", get: (r) => r["Causa Raiz"] },
 ];
 
-function ChamadosPorMarca() {
+export default function ChamadosPorMarca() {
   const { data } = useSuspenseQuery(solicitacoesQueryOptions);
 
   // escopo: chamados de Crossdocking (quando a base tiver essa modalidade)
