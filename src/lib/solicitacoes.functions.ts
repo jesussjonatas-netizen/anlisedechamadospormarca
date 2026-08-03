@@ -1,7 +1,26 @@
 import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { createClient } from "@supabase/supabase-js";
 import type { Solicitacao } from "./auditoria-types";
 
+function isNewSupabaseApiKey(value: string): boolean {
+  return value.startsWith("sb_publishable_") || value.startsWith("sb_secret_");
+}
+
+function createSupabaseFetch(supabaseKey: string): typeof fetch {
+  return (input, init) => {
+    const headers = new Headers(
+      typeof Request !== "undefined" && input instanceof Request ? input.headers : undefined,
+    );
+    if (init?.headers) {
+      new Headers(init.headers).forEach((value, key) => headers.set(key, value));
+    }
+    if (isNewSupabaseApiKey(supabaseKey) && headers.get("Authorization") === `Bearer ${supabaseKey}`) {
+      headers.delete("Authorization");
+    }
+    headers.set("apikey", supabaseKey);
+    return fetch(input, { ...init, headers });
+  };
+}
 
 function dbToSolicitacao(row: Record<string, unknown>): Solicitacao {
   return {
@@ -35,34 +54,43 @@ function dbToSolicitacao(row: Record<string, unknown>): Solicitacao {
   };
 }
 
-export const getSolicitacoes = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const allRows: Record<string, unknown>[] = [];
-    const pageSize = 1000;
-    let start = 0;
-    while (true) {
-      const { data, error } = await context.supabase
-        .from("solicitacoes")
-        .select("*")
-        .range(start, start + pageSize - 1)
-        .order("id", { ascending: true });
-      if (error) throw error;
-      if (!data || data.length === 0) break;
-      allRows.push(...(data as Record<string, unknown>[]));
-      if (data.length < pageSize) break;
-      start += pageSize;
-    }
+export const getSolicitacoes = createServerFn({ method: "GET" }).handler(async () => {
+  const supabasePublic = createClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_PUBLISHABLE_KEY!,
+    {
+      global: { fetch: createSupabaseFetch(process.env.SUPABASE_PUBLISHABLE_KEY!) },
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        storage: undefined,
+      },
+    },
+  );
 
-    return {
-      rows: allRows.map(dbToSolicitacao),
-      lastUpdate: new Date().toISOString(),
-    };
-  });
+  const allRows: Record<string, unknown>[] = [];
+  const pageSize = 1000;
+  let start = 0;
+  while (true) {
+    const { data, error } = await supabasePublic
+      .from("solicitacoes")
+      .select("*")
+      .range(start, start + pageSize - 1)
+      .order("id", { ascending: true });
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+    allRows.push(...data);
+    if (data.length < pageSize) break;
+    start += pageSize;
+  }
 
+  return {
+    rows: allRows.map(dbToSolicitacao),
+    lastUpdate: new Date().toISOString(),
+  };
+});
 
 export const seedSolicitacoes = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
   .inputValidator((data: { rows: Solicitacao[] }) => data)
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -106,9 +134,7 @@ export const seedSolicitacoes = createServerFn({ method: "POST" })
     return { inserted: inserts.length };
   });
 
-export const seedFromJsonFile = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .handler(async () => {
+export const seedFromJsonFile = createServerFn({ method: "POST" }).handler(async () => {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { default: rawRows } = await import("@/data/solicitacoes.json");
 

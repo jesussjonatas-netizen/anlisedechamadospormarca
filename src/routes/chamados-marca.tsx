@@ -30,7 +30,7 @@ import { solicitacoesQueryOptions } from "@/lib/solicitacoes-queries";
 import { CxKpiCard, CxMultiSelect, CxPanel, CxQuickSelect, CxSearch } from "@/components/cx-ui";
 import ancoraLogo from "@/assets/ancora-logo.png";
 
-export const Route = createFileRoute("/_authenticated/chamados-marca")({
+export const Route = createFileRoute("/chamados-marca")({
   head: () => ({
     meta: [
       { title: "Análise de Chamados por Marca | Rede ANCORA" },

@@ -9,116 +9,68 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
-import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
-import { Route as AuthenticatedChamadosMarcaRouteImport } from './routes/_authenticated/chamados-marca'
+import { Route as ChamadosMarcaRouteImport } from './routes/chamados-marca'
+import { Route as IndexRouteImport } from './routes/index'
 
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
+const ChamadosMarcaRoute = ChamadosMarcaRouteImport.update({
+  id: '/chamados-marca',
+  path: '/chamados-marca',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AuthenticatedRouteRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedChamadosMarcaRoute =
-  AuthenticatedChamadosMarcaRouteImport.update({
-    id: '/chamados-marca',
-    path: '/chamados-marca',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof AuthenticatedIndexRoute
-  '/auth': typeof AuthRoute
-  '/chamados-marca': typeof AuthenticatedChamadosMarcaRoute
+  '/': typeof IndexRoute
+  '/chamados-marca': typeof ChamadosMarcaRoute
 }
 export interface FileRoutesByTo {
-  '/auth': typeof AuthRoute
-  '/chamados-marca': typeof AuthenticatedChamadosMarcaRoute
-  '/': typeof AuthenticatedIndexRoute
+  '/': typeof IndexRoute
+  '/chamados-marca': typeof ChamadosMarcaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/auth': typeof AuthRoute
-  '/_authenticated/chamados-marca': typeof AuthenticatedChamadosMarcaRoute
-  '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/': typeof IndexRoute
+  '/chamados-marca': typeof ChamadosMarcaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/chamados-marca'
+  fullPaths: '/' | '/chamados-marca'
   fileRoutesByTo: FileRoutesByTo
-  to: '/auth' | '/chamados-marca' | '/'
-  id:
-    | '__root__'
-    | '/_authenticated'
-    | '/auth'
-    | '/_authenticated/chamados-marca'
-    | '/_authenticated/'
+  to: '/' | '/chamados-marca'
+  id: '__root__' | '/' | '/chamados-marca'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  AuthRoute: typeof AuthRoute
+  IndexRoute: typeof IndexRoute
+  ChamadosMarcaRoute: typeof ChamadosMarcaRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/': {
-      id: '/_authenticated/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/chamados-marca': {
-      id: '/_authenticated/chamados-marca'
+    '/chamados-marca': {
+      id: '/chamados-marca'
       path: '/chamados-marca'
       fullPath: '/chamados-marca'
-      preLoaderRoute: typeof AuthenticatedChamadosMarcaRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      preLoaderRoute: typeof ChamadosMarcaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
 
-interface AuthenticatedRouteRouteChildren {
-  AuthenticatedChamadosMarcaRoute: typeof AuthenticatedChamadosMarcaRoute
-  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
-}
-
-const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedChamadosMarcaRoute: AuthenticatedChamadosMarcaRoute,
-  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
-}
-
-const AuthenticatedRouteRouteWithChildren =
-  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
-  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  AuthRoute: AuthRoute,
+  IndexRoute: IndexRoute,
+  ChamadosMarcaRoute: ChamadosMarcaRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
