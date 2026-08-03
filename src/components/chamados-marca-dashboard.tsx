@@ -201,21 +201,16 @@ const TABLE_COLS: { key: string; label: string; get: (r: Solicitacao) => string 
 export default function ChamadosPorMarca() {
   const { data } = useSuspenseQuery(solicitacoesQueryOptions);
 
-  // escopo: chamados de Crossdocking (quando a base tiver essa modalidade)
-  const base = useMemo(() => {
-    const cross = data.rows.filter((r: Solicitacao) => norm(r.Modalidade).includes("crossdocking"));
-    return cross.length > 0 ? cross : data.rows;
-  }, [data.rows]);
+  // escopo: base completa (sem filtros de importação)
+  const base = useMemo(() => data.rows as Solicitacao[], [data.rows]);
 
   const [filters, setFilters] = useState<FilterState>(emptyFilters);
-  const [busca, setBusca] = useState("");
   const [buscaMarca, setBuscaMarca] = useState("");
   const [buscaProc, setBuscaProc] = useState("");
   const [buscaItem, setBuscaItem] = useState("");
+  const [buscaCliente, setBuscaCliente] = useState("");
   const [granularidade, setGranularidade] = useState<"Dia" | "Mês" | "Ano">("Mês");
-  const [sortKey, setSortKey] = useState<string>("Data");
-  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
-  const [page, setPage] = useState(1);
+
 
   const filtered = useMemo(() => applyFilters(base, filters), [base, filters]);
 
