@@ -13,17 +13,7 @@ import {
   CartesianGrid,
   LabelList,
 } from "recharts";
-import {
-  CheckCircle2,
-  ChevronUp,
-  ChevronDown,
-  Clock3,
-  Download,
-  Eraser,
-  Filter,
-  Search,
-  XCircle,
-} from "lucide-react";
+import { CheckCircle2, ChevronUp, ChevronDown, Clock3, Download, Eraser, Filter, Search, XCircle } from "lucide-react";
 import type { Solicitacao } from "@/lib/auditoria-types";
 import { solicitacoesQueryOptions } from "@/lib/solicitacoes-queries";
 import { CxKpiCard, CxMultiSelect, CxPanel, CxQuickSelect, CxSearch } from "@/components/cx-ui";
@@ -32,20 +22,7 @@ const BLUE = "#083B63";
 const GREEN = "#7AC143";
 const RED = "#CE0E2D";
 
-const MESES = [
-  "Jan",
-  "Fev",
-  "Mar",
-  "Abr",
-  "Mai",
-  "Jun",
-  "Jul",
-  "Ago",
-  "Set",
-  "Out",
-  "Nov",
-  "Dez",
-];
+const MESES = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
 const fmtInt = (v: number) => v.toLocaleString("pt-BR");
 const fmtBRL = (v: number) =>
@@ -211,12 +188,10 @@ export default function ChamadosPorMarca() {
   const [buscaCliente, setBuscaCliente] = useState("");
   const [granularidade, setGranularidade] = useState<"Dia" | "Mês" | "Ano">("Mês");
 
-
   const filtered = useMemo(() => applyFilters(base, filters), [base, filters]);
 
   const opts = useMemo(() => {
-    const o = (k: FilterKey, ordered?: string[]) =>
-      uniqSorted(applyFilters(base, filters, k).map(getters[k]), ordered);
+    const o = (k: FilterKey, ordered?: string[]) => uniqSorted(applyFilters(base, filters, k).map(getters[k]), ordered);
     return {
       ano: o("ano"),
       mes: o("mes", MESES),
@@ -366,15 +341,12 @@ export default function ChamadosPorMarca() {
 
   const exportar = async () => {
     const XLSX = await import("xlsx");
-    const dados = filtered.map((r) =>
-      Object.fromEntries(TABLE_COLS.map((c) => [c.label, c.get(r) ?? ""])),
-    );
+    const dados = filtered.map((r) => Object.fromEntries(TABLE_COLS.map((c) => [c.label, c.get(r) ?? ""])));
     const ws = XLSX.utils.json_to_sheet(dados);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Chamados");
     XLSX.writeFile(wb, "chamados-por-marca.xlsx");
   };
-
 
   const ultimaAtualizacao = new Date(data.lastUpdate).toLocaleString("pt-BR", {
     timeZone: "America/Sao_Paulo",
@@ -385,7 +357,7 @@ export default function ChamadosPorMarca() {
   return (
     <div className="cx-theme min-h-screen">
       {/* Cabeçalho */}
-      <header className="border-b-4 border-[var(--cx-green)] bg-[var(--cx-blue)] text-white">
+      <header className="border-b-6 border-[var(--cx-green)] bg-[var(--cx-blue)] text-white">
         <div className="mx-auto flex max-w-[1800px] flex-wrap items-center justify-between gap-4 px-4 py-4 md:px-6">
           <img src={ancoraLogo} alt="Logo Rede ANCORA" className="h-10 w-auto" />
           <h1 className="order-3 w-full text-center text-lg font-bold tracking-tight md:order-2 md:w-auto md:text-xl">
@@ -409,13 +381,38 @@ export default function ChamadosPorMarca() {
               <CxQuickSelect label="Ano" options={opts.ano} value={filters.ano} onChange={setFilter("ano")} cols={3} />
               <CxQuickSelect label="Mês" options={opts.mes} value={filters.mes} onChange={setFilter("mes")} cols={4} />
               <CxMultiSelect label="Marca" options={opts.marca} value={filters.marca} onChange={setFilter("marca")} />
-              <CxMultiSelect label="Região" options={opts.regiao} value={filters.regiao} onChange={setFilter("regiao")} />
+              <CxMultiSelect
+                label="Região"
+                options={opts.regiao}
+                value={filters.regiao}
+                onChange={setFilter("regiao")}
+              />
               <CxMultiSelect label="CD" options={opts.cd} value={filters.cd} onChange={setFilter("cd")} />
-              <CxMultiSelect label="Cliente" options={opts.cliente} value={filters.cliente} onChange={setFilter("cliente")} />
-              <CxMultiSelect label="Modalidade" options={opts.modalidade} value={filters.modalidade} onChange={setFilter("modalidade")} />
+              <CxMultiSelect
+                label="Cliente"
+                options={opts.cliente}
+                value={filters.cliente}
+                onChange={setFilter("cliente")}
+              />
+              <CxMultiSelect
+                label="Modalidade"
+                options={opts.modalidade}
+                value={filters.modalidade}
+                onChange={setFilter("modalidade")}
+              />
               <CxMultiSelect label="Tipo" options={opts.tipo} value={filters.tipo} onChange={setFilter("tipo")} />
-              <CxMultiSelect label="Status" options={opts.status} value={filters.status} onChange={setFilter("status")} />
-              <CxMultiSelect label="Procedência" options={opts.procedencia} value={filters.procedencia} onChange={setFilter("procedencia")} />
+              <CxMultiSelect
+                label="Status"
+                options={opts.status}
+                value={filters.status}
+                onChange={setFilter("status")}
+              />
+              <CxMultiSelect
+                label="Procedência"
+                options={opts.procedencia}
+                value={filters.procedencia}
+                onChange={setFilter("procedencia")}
+              />
               {filters.nome.length > 0 && (
                 <div className="rounded-md border border-[var(--cx-border)] bg-[var(--cx-bg)] p-2 text-xs">
                   <div className="font-semibold text-[var(--cx-blue)]">Item selecionado</div>
@@ -516,9 +513,28 @@ export default function ChamadosPorMarca() {
                     <YAxis type="category" dataKey="marca" width={130} tick={{ fontSize: 11 }} />
                     <Tooltip formatter={(v: number) => fmtInt(v)} />
                     <Legend />
-                    <Bar dataKey="Procedente" stackId="p" fill={GREEN} cursor="pointer" onClick={(d: { marca?: string }) => d?.marca && toggleValue("marca", d.marca)} />
-                    <Bar dataKey="Em tratativa" stackId="p" fill={BLUE} cursor="pointer" onClick={(d: { marca?: string }) => d?.marca && toggleValue("marca", d.marca)} />
-                    <Bar dataKey="Improcedente" stackId="p" fill={RED} radius={[0, 4, 4, 0]} cursor="pointer" onClick={(d: { marca?: string }) => d?.marca && toggleValue("marca", d.marca)}>
+                    <Bar
+                      dataKey="Procedente"
+                      stackId="p"
+                      fill={GREEN}
+                      cursor="pointer"
+                      onClick={(d: { marca?: string }) => d?.marca && toggleValue("marca", d.marca)}
+                    />
+                    <Bar
+                      dataKey="Em tratativa"
+                      stackId="p"
+                      fill={BLUE}
+                      cursor="pointer"
+                      onClick={(d: { marca?: string }) => d?.marca && toggleValue("marca", d.marca)}
+                    />
+                    <Bar
+                      dataKey="Improcedente"
+                      stackId="p"
+                      fill={RED}
+                      radius={[0, 4, 4, 0]}
+                      cursor="pointer"
+                      onClick={(d: { marca?: string }) => d?.marca && toggleValue("marca", d.marca)}
+                    >
                       <LabelList dataKey="rotulo" position="right" style={{ fontSize: 10, fill: "#667585" }} />
                     </Bar>
                   </BarChart>
@@ -612,7 +628,6 @@ export default function ChamadosPorMarca() {
               </ResponsiveContainer>
             </div>
           </CxPanel>
-
         </main>
       </div>
 
