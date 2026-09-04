@@ -13,11 +13,12 @@ import {
   CartesianGrid,
   LabelList,
 } from "recharts";
-import { CheckCircle2, ChevronUp, ChevronDown, Clock3, Download, Eraser, Filter, Search, XCircle } from "lucide-react";
+import { CheckCircle2, ChevronUp, ChevronDown, Clock3, Download, Eraser, Filter, Search, Upload, XCircle } from "lucide-react";
 import type { Solicitacao } from "@/lib/auditoria-types";
 import { solicitacoesQueryOptions } from "@/lib/solicitacoes-queries";
 import { CxKpiCard, CxMultiSelect, CxPanel, CxQuickSelect, CxSearch } from "@/components/cx-ui";
 import ancoraLogo from "@/assets/ancora-logo.png";
+import ImportModal from "@/components/import-modal";
 const BLUE = "#083B63";
 const GREEN = "#7AC143";
 const RED = "#CE0E2D";
@@ -339,6 +340,8 @@ export default function ChamadosPorMarca() {
     setBuscaCliente("");
   };
 
+  const [importOpen, setImportOpen] = useState(false);
+
   const exportar = async () => {
     const XLSX = await import("xlsx");
     const dados = filtered.map((r) => Object.fromEntries(TABLE_COLS.map((c) => [c.label, c.get(r) ?? ""])));
@@ -356,6 +359,7 @@ export default function ChamadosPorMarca() {
 
   return (
     <div className="cx-theme min-h-screen">
+      {importOpen && <ImportModal existentes={data.rows} onClose={() => setImportOpen(false)} />}
       {/* Cabeçalho */}
       <header className="border-b-6 border-[var(--cx-green)] bg-[var(--cx-blue)] text-white">
         <div className="mx-auto flex max-w-[1800px] flex-wrap items-center justify-between gap-4 px-4 py-4 md:px-6">
@@ -434,6 +438,13 @@ export default function ChamadosPorMarca() {
                 className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-[var(--cx-green)] px-3 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
               >
                 <Download className="h-4 w-4" /> Exportar seleção para Excel
+              </button>
+              <button
+                type="button"
+                onClick={() => setImportOpen(true)}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-[var(--cx-blue)] px-3 py-2 text-sm font-semibold text-[var(--cx-blue)] transition-colors hover:bg-[var(--cx-bg)]"
+              >
+                <Upload className="h-4 w-4" /> Importar
               </button>
             </div>
           </div>
