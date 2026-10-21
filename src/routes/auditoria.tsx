@@ -31,7 +31,6 @@ import {
   type StatusKey,
 } from "@/lib/auditoria-types";
 import { solicitacoesQueryOptions } from "@/lib/solicitacoes-queries";
-import { seedSolicitacoes } from "@/lib/solicitacoes.functions";
 import { useServerFn } from "@tanstack/react-start";
 import ancoraLogo from "@/assets/ancora-logo.png";
 
@@ -315,7 +314,6 @@ function Dashboard() {
   const rows = data.rows;
   const lastUpdate = new Date(data.lastUpdate);
   const queryClient = useQueryClient();
-  const seedFn = useServerFn(seedSolicitacoes);
   const [filters, setFilters] = useState<FilterState>(emptyFilters);
   const [sortKey, setSortKey] = useState<string>("Valor");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
@@ -553,7 +551,8 @@ function Dashboard() {
         } as Solicitacao;
       })
       .filter((x): x is Solicitacao => x !== null);
-    await seedFn({ data: { rows: parsed } });
+    // A importação agora é feita pelo botão Importar do painel principal (fluxo com senha no servidor).
+    void parsed;
     await queryClient.invalidateQueries({ queryKey: ["solicitacoes"] });
     setFilters(emptyFilters);
   };
@@ -680,24 +679,6 @@ function Dashboard() {
               </select>
             </div>
 
-            <input
-              ref={fileRef}
-              type="file"
-              accept=".xlsx,.xls"
-              className="hidden"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) onUpload(f);
-                e.target.value = "";
-              }}
-            />
-            <button
-              onClick={() => fileRef.current?.click()}
-              className="inline-flex items-center gap-2 rounded-md border border-border bg-secondary px-3 py-2 text-sm font-semibold text-foreground hover:bg-panel-header"
-            >
-              <Upload className="h-4 w-4" />
-              Importar planilha
-            </button>
             <button
               onClick={downloadExcel}
               className="inline-flex items-center gap-2 rounded-md bg-brand px-3 py-2 text-sm font-semibold text-white hover:brightness-110"
