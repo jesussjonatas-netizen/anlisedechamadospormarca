@@ -14,6 +14,150 @@ export type Database = {
   }
   public: {
     Tables: {
+      chamados_por_marca: {
+        Row: {
+          causa_raiz: string | null
+          cd: string | null
+          cd_full: string | null
+          cliente: string | null
+          cna: string | null
+          codigo: string | null
+          conf_checkout: string | null
+          conf_expedicao: string | null
+          conf_separacao: string | null
+          created_at: string
+          data_entrada: string | null
+          data_validacao: string | null
+          documento: string | null
+          entrada_devolucao: string | null
+          id: string
+          id_portal: string
+          marca: string | null
+          modalidade: string | null
+          nf: string | null
+          nf_devolucao: string | null
+          nfd: string | null
+          nfe_fabricante: string | null
+          nfe_transportadora: string | null
+          no_status_atual: string | null
+          nome: string | null
+          numero_benner: string | null
+          obs_reprovacao_aprovacao: string | null
+          procedencia: string | null
+          quantidade: number | null
+          quantidade_a_retornar: number | null
+          quantidade_desejada: number | null
+          regiao: string | null
+          situacao: string | null
+          status: string | null
+          status_auditoria: string | null
+          tempo_aberto: string | null
+          tipo: string | null
+          updated_at: string
+          validador: string | null
+          valor: number | null
+        }
+        Insert: {
+          causa_raiz?: string | null
+          cd?: string | null
+          cd_full?: string | null
+          cliente?: string | null
+          cna?: string | null
+          codigo?: string | null
+          conf_checkout?: string | null
+          conf_expedicao?: string | null
+          conf_separacao?: string | null
+          created_at?: string
+          data_entrada?: string | null
+          data_validacao?: string | null
+          documento?: string | null
+          entrada_devolucao?: string | null
+          id?: string
+          id_portal: string
+          marca?: string | null
+          modalidade?: string | null
+          nf?: string | null
+          nf_devolucao?: string | null
+          nfd?: string | null
+          nfe_fabricante?: string | null
+          nfe_transportadora?: string | null
+          no_status_atual?: string | null
+          nome?: string | null
+          numero_benner?: string | null
+          obs_reprovacao_aprovacao?: string | null
+          procedencia?: string | null
+          quantidade?: number | null
+          quantidade_a_retornar?: number | null
+          quantidade_desejada?: number | null
+          regiao?: string | null
+          situacao?: string | null
+          status?: string | null
+          status_auditoria?: string | null
+          tempo_aberto?: string | null
+          tipo?: string | null
+          updated_at?: string
+          validador?: string | null
+          valor?: number | null
+        }
+        Update: {
+          causa_raiz?: string | null
+          cd?: string | null
+          cd_full?: string | null
+          cliente?: string | null
+          cna?: string | null
+          codigo?: string | null
+          conf_checkout?: string | null
+          conf_expedicao?: string | null
+          conf_separacao?: string | null
+          created_at?: string
+          data_entrada?: string | null
+          data_validacao?: string | null
+          documento?: string | null
+          entrada_devolucao?: string | null
+          id?: string
+          id_portal?: string
+          marca?: string | null
+          modalidade?: string | null
+          nf?: string | null
+          nf_devolucao?: string | null
+          nfd?: string | null
+          nfe_fabricante?: string | null
+          nfe_transportadora?: string | null
+          no_status_atual?: string | null
+          nome?: string | null
+          numero_benner?: string | null
+          obs_reprovacao_aprovacao?: string | null
+          procedencia?: string | null
+          quantidade?: number | null
+          quantidade_a_retornar?: number | null
+          quantidade_desejada?: number | null
+          regiao?: string | null
+          situacao?: string | null
+          status?: string | null
+          status_auditoria?: string | null
+          tempo_aberto?: string | null
+          tipo?: string | null
+          updated_at?: string
+          validador?: string | null
+          valor?: number | null
+        }
+        Relationships: []
+      }
+      chamados_por_marca_meta: {
+        Row: {
+          atualizado_em: string
+          id: number
+        }
+        Insert: {
+          atualizado_em?: string
+          id?: number
+        }
+        Update: {
+          atualizado_em?: string
+          id?: number
+        }
+        Relationships: []
+      }
       solicitacoes: {
         Row: {
           ano: number | null
@@ -115,7 +259,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      importar_chamados_por_marca: { Args: { _rows: Json }; Returns: Json }
     }
     Enums: {
       [_ in never]: never
